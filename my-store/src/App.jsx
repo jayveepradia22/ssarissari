@@ -2070,7 +2070,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
               </div>
             </div>
           </div>
-        )}
+        )} 
 
         {tab==="security"&&(
           <div className="card" style={{padding:22}}>
