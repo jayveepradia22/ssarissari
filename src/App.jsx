@@ -553,57 +553,7 @@ export default function App(){
     <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100vh",padding:20}}>
       <div className="card" style={{width:"100%",maxWidth:380,padding:"36px 28px"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
-          {/* Ligaya's Store Logo */}
           <div style={{margin:"0 auto 14px",width:120,height:120,display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
-              {/* Background circle */}
-              <circle cx="100" cy="100" r="98" fill="#1a0f00" stroke="#8B5E3C" strokeWidth="3"/>
-              {/* Top banner arch */}
-              <path d="M30 70 Q100 20 170 70" fill="#6B3A1F" stroke="#4a2510" strokeWidth="2"/>
-              <path d="M35 65 Q100 15 165 65 Q100 30 35 65Z" fill="#8B5E3C"/>
-              {/* LIGAYA'S text on arch */}
-              <text x="100" y="56" textAnchor="middle" fontSize="18" fontWeight="800" fontFamily="Georgia,serif" fill="#F5E6D0" letterSpacing="1.5">LIGAYA'S</text>
-              {/* Nipa hut body */}
-              <rect x="62" y="115" width="76" height="52" fill="#6B3A1F" stroke="#4a2510" strokeWidth="1.5" rx="1"/>
-              {/* Hut door */}
-              <rect x="88" y="135" width="24" height="32" fill="#4a2510" rx="2"/>
-              {/* Hut window */}
-              <rect x="66" y="122" width="16" height="14" fill="#4a2510" rx="2"/>
-              {/* Thatched roof */}
-              <polygon points="55,118 100,78 145,118" fill="#8B6914" stroke="#6B5010" strokeWidth="1"/>
-              <polygon points="55,118 100,80 145,118 140,118 100,84 60,118Z" fill="#A07820"/>
-              {/* Roof texture lines */}
-              <line x1="70" y1="118" x2="90" y2="86" stroke="#6B5010" strokeWidth="1" opacity="0.6"/>
-              <line x1="85" y1="118" x2="98" y2="81" stroke="#6B5010" strokeWidth="1" opacity="0.6"/>
-              <line x1="115" y1="118" x2="102" y2="81" stroke="#6B5010" strokeWidth="1" opacity="0.6"/>
-              <line x1="130" y1="118" x2="110" y2="86" stroke="#6B5010" strokeWidth="1" opacity="0.6"/>
-              {/* Awning */}
-              <rect x="62" y="115" width="76" height="8" fill="#D4A853" rx="1"/>
-              {/* Store counter/shelf */}
-              <rect x="50" y="147" width="100" height="6" fill="#8B5E3C" stroke="#6B3A1F" strokeWidth="1" rx="1"/>
-              {/* Products on shelf - bottles */}
-              <rect x="54" y="135" width="6" height="13" fill="#1a3a6b" rx="2"/>
-              <rect x="62" y="137" width="6" height="11" fill="#8B1a1a" rx="2"/>
-              <rect x="116" y="136" width="7" height="12" fill="#2d8b1a" rx="2"/>
-              <rect x="125" y="137" width="6" height="11" fill="#d4821a" rx="2"/>
-              {/* Rice sack */}
-              <ellipse cx="75" cy="152" rx="10" ry="8" fill="#c8b06e" stroke="#9a7a3a" strokeWidth="1"/>
-              <text x="75" y="154" textAnchor="middle" fontSize="5" fill="#6B4a10" fontWeight="600">RICE</text>
-              {/* Leaves left */}
-              <path d="M25 130 Q38 100 50 115 Q38 118 25 130Z" fill="#2d5a1a" opacity="0.8"/>
-              <path d="M20 145 Q35 115 48 125 Q32 130 20 145Z" fill="#3a6b22" opacity="0.7"/>
-              {/* Leaves right */}
-              <path d="M175 130 Q162 100 150 115 Q162 118 175 130Z" fill="#2d5a1a" opacity="0.8"/>
-              <path d="M180 145 Q165 115 152 125 Q168 130 180 145Z" fill="#3a6b22" opacity="0.7"/>
-              {/* Bottom banner */}
-              <path d="M45 168 Q100 158 155 168 Q100 175 45 168Z" fill="#8B5E3C"/>
-              <rect x="42" y="162" width="116" height="18" fill="#B87333" rx="4" stroke="#8B5020" strokeWidth="1.5"/>
-              {/* Rivets */}
-              <circle cx="52" cy="171" r="3" fill="#D4921E"/>
-              <circle cx="148" cy="171" r="3" fill="#D4921E"/>
-              {/* STORE text */}
-              <text x="100" y="175" textAnchor="middle" fontSize="14" fontWeight="800" fontFamily="Georgia,serif" fill="#1a0f00" letterSpacing="2">STORE</text>
-            </svg>
           </div>
           <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>Ligaya's Store</h1>
           <p style={{color:"var(--tx2)",fontSize:13,fontWeight:500}}>Store Management System</p>
