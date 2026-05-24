@@ -50,10 +50,15 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
 .no-scrollbar{scrollbar-width:none;-ms-overflow-style:none}
 .no-scrollbar::-webkit-scrollbar{display:none}
-/* Horizontal pill-row scrollbar */
-.hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
-.hscroll::-webkit-scrollbar{height:3px}
-.hscroll::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+/* Horizontal pill-row scrollbar — invisible */
+.hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.hscroll::-webkit-scrollbar{display:none}
+
+/* Hide horizontal scrollbars globally on all sections */
+.tabs{scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.pg-hdr [style*="overflow-x"]{scrollbar-width:none;-ms-overflow-style:none}
+.pg-hdr [style*="overflow-x"]::-webkit-scrollbar{display:none}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
   padding:11px 20px;border-radius:var(--rs);font-size:14px;font-weight:600;
@@ -129,7 +134,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   box-shadow:0 2px 8px rgba(0,0,0,.08);
   z-index:10;
   transition:background .25s}
-@media(max-width:768px){.pg-hdr{padding:14px 16px 12px}}
+@media(max-width:768px){.pg-hdr{padding:10px 12px 8px}}
 
 /* pg-body: THE scroll container — all page content lives here */
 .pg-body{
@@ -140,7 +145,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   padding:24px;
   background:var(--bg);
   min-height:0}
-@media(max-width:768px){.pg-body{padding:16px;padding-bottom:88px}}
+@media(max-width:768px){.pg-body{padding:6px 0 80px;background:var(--bg)}}
 
 .topbar{display:none;align-items:center;justify-content:space-between;
   padding:13px 18px;background:var(--sf);border-bottom:1.5px solid var(--bd);
@@ -201,6 +206,36 @@ tr:hover td{background:var(--sf2)}
 .rfont{font-family:'Courier New',monospace;font-size:13px;line-height:1.7}
 @media print{body *{visibility:hidden}.printable,.printable *{visibility:visible}.printable{position:fixed;inset:0;padding:20px}}
 
+/* ── MOBILE DENSE LAYOUT ──────────────────────────────────
+   Edge-to-edge, zero-gap modules for all sections on mobile
+───────────────────────────────────────────────────────── */
+@media(max-width:768px){
+  /* Cards stretch edge-to-edge with no side margins */
+  .pg-body>.card,
+  .pg-body>div>.card{
+    border-radius:0!important;
+    border-left:none!important;
+    border-right:none!important;
+    margin:0!important;
+  }
+  /* Stack sections with only a thin divider, no gap */
+  .pg-body{display:block}
+  /* Dashboard KPI grid — fill width */
+  .pg-body>[style*="grid-template-columns:\"1fr 1fr\""],
+  .pg-body [style*="gridTemplateColumns:\"1fr 1fr\""]{
+    gap:2px!important;
+  }
+  /* Utang customer cards: no side gaps, minimal vertical gap */
+  .pg-body>.card+.card{margin-top:2px!important}
+  /* Inventory cards: tighter */
+  .pg-body [style*="minmax(280px"]{gap:2px!important}
+  /* KPI/stat cards: denser */
+  .sc{padding:10px 12px!important;border-radius:0!important;border-left:none!important;border-right:none!important}
+  /* Reduce internal padding on all cards in mobile */
+  .card{padding:12px!important}
+  /* Bottom nav spacing for dense body */
+}
+
 .sbar{position:relative}
 .sbar input{padding-left:40px;padding-right:36px}
 .sbic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:17px;pointer-events:none;z-index:1}
@@ -210,9 +245,8 @@ tr:hover td{background:var(--sf2)}
   border-radius:50%;padding:0;transition:all .15s}
 .sbar-x:hover{background:var(--bd);color:var(--tx)}
 
-.tabs{display:flex;border-bottom:2px solid var(--bd);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tabs::-webkit-scrollbar{height:3px}
-.tabs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.tabs{display:flex;border-bottom:2px solid var(--bd);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
 .tabi{padding:10px 18px;cursor:pointer;font-size:14px;font-weight:600;
   color:var(--tx2);border-bottom:2.5px solid transparent;margin-bottom:-2px;
   transition:all .18s;white-space:nowrap}
@@ -674,21 +708,7 @@ export default function App(){
       <div className="topbar">
         <button style={{display:"flex",alignItems:"center",gap:8,minWidth:0,background:"none",border:"none",cursor:"pointer",padding:0}}
           onClick={()=>setPage("dashboard")}>
-          <span style={{flexShrink:0,width:28,height:28,display:"inline-flex"}}>
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{width:28,height:28,borderRadius:"50%"}}>
-              <circle cx="100" cy="100" r="98" fill="#1a0f00"/>
-              <path d="M30 70 Q100 20 170 70" fill="#6B3A1F"/>
-              <path d="M35 65 Q100 15 165 65 Q100 30 35 65Z" fill="#8B5E3C"/>
-              <text x="100" y="56" textAnchor="middle" fontSize="18" fontWeight="800" fontFamily="Georgia,serif" fill="#F5E6D0" letterSpacing="1.5">LIGAYA'S</text>
-              <rect x="62" y="115" width="76" height="52" fill="#6B3A1F" rx="1"/>
-              <rect x="88" y="135" width="24" height="32" fill="#4a2510" rx="2"/>
-              <polygon points="55,118 100,78 145,118" fill="#8B6914"/>
-              <polygon points="55,118 100,80 145,118 140,118 100,84 60,118Z" fill="#A07820"/>
-              <rect x="62" y="115" width="76" height="8" fill="#D4A853" rx="1"/>
-              <rect x="42" y="162" width="116" height="18" fill="#B87333" rx="4" stroke="#8B5020" strokeWidth="1.5"/>
-              <text x="100" y="175" textAnchor="middle" fontSize="14" fontWeight="800" fontFamily="Georgia,serif" fill="#1a0f00" letterSpacing="2">STORE</text>
-            </svg>
-          </span>
+          <span style={{flexShrink:0,fontSize:26,lineHeight:1}}>🏪</span>
           <span style={{fontWeight:700,fontSize:15,color:"var(--tx)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{db.settings.storeName}</span>
         </button>
         <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
@@ -705,20 +725,7 @@ export default function App(){
         <aside className="sidebar">
           <button style={{display:"flex",alignItems:"center",gap:9,padding:"4px 8px 20px",background:"none",border:"none",cursor:"pointer",textAlign:"left"}}
             onClick={()=>setPage("dashboard")}>
-            <span style={{width:36,height:36,flexShrink:0,display:"inline-flex"}}>
-              <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style={{width:36,height:36,borderRadius:"50%"}}>
-                <circle cx="100" cy="100" r="98" fill="#1a0f00"/>
-                <path d="M35 65 Q100 15 165 65 Q100 30 35 65Z" fill="#8B5E3C"/>
-                <text x="100" y="56" textAnchor="middle" fontSize="18" fontWeight="800" fontFamily="Georgia,serif" fill="#F5E6D0" letterSpacing="1.5">LIGAYA'S</text>
-                <rect x="62" y="115" width="76" height="52" fill="#6B3A1F" rx="1"/>
-                <rect x="88" y="135" width="24" height="32" fill="#4a2510" rx="2"/>
-                <polygon points="55,118 100,78 145,118" fill="#8B6914"/>
-                <polygon points="55,118 100,80 145,118 140,118 100,84 60,118Z" fill="#A07820"/>
-                <rect x="62" y="115" width="76" height="8" fill="#D4A853" rx="1"/>
-                <rect x="42" y="162" width="116" height="18" fill="#B87333" rx="4"/>
-                <text x="100" y="175" textAnchor="middle" fontSize="14" fontWeight="800" fontFamily="Georgia,serif" fill="#1a0f00" letterSpacing="2">STORE</text>
-              </svg>
-            </span>
+            <span style={{fontSize:32,lineHeight:1,flexShrink:0}}>🏪</span>
             <div>
               <div style={{fontWeight:700,fontSize:13,color:"var(--tx)"}}>{db.settings.storeName}</div>
               <div style={{fontSize:11,color:"var(--tx3)"}}>{synced?"🟢 Synced":"🟡 Local"}</div>
@@ -801,17 +808,17 @@ function Dashboard({db,setPage}){
       {/* Scrollable body */}
       <div className="pg-body">
         {/* KPI Cards 2x2 grid */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,padding:"0 0"}}>
           {[
             {label:"Today's Sales",  value:fmt(daySales),    icon:"💵", color:"var(--ac)",   bg:"rgba(82,183,136,0.08)",  border:"rgba(82,183,136,0.25)"},
             {label:"Transactions",   value:todayTx.length,   icon:"🧾", color:"var(--in)",   bg:"rgba(86,173,245,0.08)",  border:"rgba(86,173,245,0.25)"},
             {label:"Total Products", value:prods.length,     icon:"📦", color:"#b07ef8",     bg:"rgba(176,126,248,0.08)", border:"rgba(176,126,248,0.25)"},
             {label:"Total Utang",    value:fmt(totalUtang),  icon:"📋", color:"var(--wn)",   bg:"rgba(240,165,0,0.08)",   border:"rgba(240,165,0,0.25)"},
           ].map((s,i)=>(
-            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:16,padding:"18px 16px",display:"flex",flexDirection:"column",gap:6}}>
-              <div style={{fontSize:28}}>{s.icon}</div>
-              <div style={{fontSize:22,fontWeight:800,lineHeight:1,color:s.color,marginTop:4}}>{s.value}</div>
-              <div style={{fontSize:12,color:"var(--tx2)",fontWeight:500}}>{s.label}</div>
+            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:16,padding:"16px 14px",display:"flex",flexDirection:"column",gap:4}}>
+              <div style={{fontSize:24}}>{s.icon}</div>
+              <div style={{fontSize:20,fontWeight:800,lineHeight:1,color:s.color,marginTop:2}}>{s.value}</div>
+              <div style={{fontSize:11,color:"var(--tx2)",fontWeight:500}}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -824,15 +831,15 @@ function Dashboard({db,setPage}){
               <span style={{fontWeight:700,fontSize:14,color:"var(--wn)"}}>Stock Alert</span>
               <span style={{marginLeft:"auto",background:"var(--wnl)",color:"var(--wn)",borderRadius:20,padding:"2px 10px",fontSize:12,fontWeight:700}}>{allAlerts.length} items</span>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:8}}>
               {allAlerts.map(p=>{
                 const isOut=p.stock<=0;
                 return(
-                  <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,background:"var(--sf2)",borderRadius:10,padding:"10px 12px"}}>
-                    <span style={{fontSize:20,flexShrink:0}}>{CAT_EMOJI(p.category)}</span>
+                  <div key={p.id} style={{display:"flex",alignItems:"center",gap:8,background:"var(--sf2)",borderRadius:10,padding:"8px 10px",minWidth:0}}>
+                    <span style={{fontSize:18,flexShrink:0}}>{CAT_EMOJI(p.category)}</span>
                     <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontSize:12,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--tx)"}}>{p.name}</div>
-                      <span style={{display:"inline-block",marginTop:3,padding:"2px 8px",borderRadius:20,fontSize:11,fontWeight:800,
+                      <div style={{fontSize:11,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--tx)"}}>{p.name}</div>
+                      <span style={{display:"inline-block",marginTop:2,padding:"1px 7px",borderRadius:20,fontSize:10,fontWeight:800,
                         background:isOut?"var(--dnl)":"var(--wnl)",
                         color:isOut?"var(--dn)":"var(--wn)"}}>
                         {isOut?"Out!":p.stock+" left"}
@@ -1175,7 +1182,7 @@ function POS({db,saveData,setConfirm}){
             <h1 style={{fontSize:19,fontWeight:800}}>🛒 Point of Sale</h1>
           </div>
           <SearchBar value={search} onChange={setSearch} placeholder="Search product…"/>
-          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
+          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
             {cats.map(c=><button key={c} className={`btn bsm ${catFilter===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatFilter(c)}>{c}</button>)}
           </div>
         </div>
@@ -1298,7 +1305,7 @@ function Inventory({db,saveData,setConfirm}){
             <button className="btn bp bsm" onClick={()=>{setEditP(null);setModal(true);}}>+ Add Product</button>
           </div>
           <SearchBar value={search} onChange={setSearch} placeholder="Search products…"/>
-          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
+          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
             {usedCats.map(c=><button key={c} className={`btn bsm ${catF===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatF(c)}>{c}</button>)}
           </div>
         </div>
@@ -1428,6 +1435,7 @@ function Utang({db,saveData,setConfirm}){
   const [payAmt,     setPayAmt]     = useState("");
   const [ledgerCust, setLedgerCust] = useState(null);
   const [search,     setSearch]     = useState("");
+  const [expandedId, setExpandedId] = useState(null);
 
   const customers =db.customers||[];
   const ledger    =db.utangLedger||[];
@@ -1593,10 +1601,13 @@ function Utang({db,saveData,setConfirm}){
               {search?"No customers match your search.":"No customers yet."}
             </div>
           )}
-          {filteredCustomers.map(c=>(
+          {filteredCustomers.map(c=>{
+            const isExpanded=expandedId===c.id;
+            return(
             <div key={c.id} className="card" style={{padding:"16px 18px"}}>
-              {/* Header row: avatar + name/contact + status badge */}
-              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
+              {/* Header row: avatar + name/contact + status badge — clickable to toggle */}
+              <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}
+                onClick={()=>setExpandedId(isExpanded?null:c.id)}>
                 <div style={{width:42,height:42,borderRadius:"50%",background:"var(--acl)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:17,color:"var(--ac)",flexShrink:0}}>
                   {c.name.charAt(0).toUpperCase()}
                 </div>
@@ -1604,24 +1615,30 @@ function Utang({db,saveData,setConfirm}){
                   <div style={{fontWeight:700,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
                   <div style={{fontSize:12,color:"var(--tx3)"}}>{c.contact?"Contact: "+c.contact:"—"}</div>
                 </div>
-                <span className={`badge ${c.balance>0?"bg-r":"bg-g"}`} style={{fontSize:12,padding:"4px 12px",flexShrink:0}}>
-                  {c.balance>0?"ACTIVE UTANG":"PAID"}
-                </span>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+                  <span className={`badge ${c.balance>0?"bg-r":"bg-g"}`} style={{fontSize:12,padding:"4px 12px"}}>
+                    {c.balance>0?"ACTIVE UTANG":"PAID"}
+                  </span>
+                  <span style={{fontSize:12,color:"var(--tx3)",transition:"transform .2s",display:"inline-block",transform:isExpanded?"rotate(180deg)":"rotate(0deg)"}}>▼</span>
+                </div>
               </div>
-              {/* Balance row */}
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+              {/* Balance row — always visible */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
                 <span style={{fontSize:13,color:"var(--tx2)"}}>Current Balance:</span>
                 <span style={{fontSize:18,fontWeight:800,color:c.balance>0?"var(--dn)":"var(--ac)"}}>{fmt(c.balance)}</span>
               </div>
-              {/* Action buttons */}
-              <div style={{display:"grid",gridTemplateColumns:c.balance>0?"1fr 1fr auto auto":"1fr auto auto",gap:8,alignItems:"center"}}>
-                <button className="btn bg2 bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={()=>setLedgerCust(c)}>📋 Ledger</button>
-                {c.balance>0&&<button className="btn bp bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={()=>{setPayModal(c);setPayAmt("");}}>💵 Payment</button>}
-                <button className="btn bg2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={()=>{setEditCust({...c});setCustModal(true);}}>✏️</button>
-                <button className="btn bd2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={()=>deleteCust(c)}>🗑️</button>
-              </div>
+              {/* Action buttons — only shown when expanded */}
+              {isExpanded&&(
+                <div style={{display:"grid",gridTemplateColumns:c.balance>0?"1fr 1fr auto auto":"1fr auto auto",gap:8,alignItems:"center",marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)",animation:"shUp .15s ease"}}>
+                  <button className="btn bg2 bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={e=>{e.stopPropagation();setLedgerCust(c);}}>📋 Ledger</button>
+                  {c.balance>0&&<button className="btn bp bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={e=>{e.stopPropagation();setPayModal(c);setPayAmt("");}}>💵 Payment</button>}
+                  <button className="btn bg2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={e=>{e.stopPropagation();setEditCust({...c});setCustModal(true);}}>✏️</button>
+                  <button className="btn bd2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={e=>{e.stopPropagation();deleteCust(c);}}>🗑️</button>
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>{/* /pg-page */}
     </div>
@@ -1651,7 +1668,10 @@ function CustForm({init,onSave,onClose}){
       </div>
       <div style={{display:"flex",gap:10,marginTop:6}}>
         <button className="btn bg2" style={{flex:1}} onClick={onClose}>✕ Cancel</button>
-        <button className="btn bp" style={{flex:1}} onClick={()=>onSave(form,isNew)}>💾 Save</button>
+        <button className="btn bp" style={{flex:1}} onClick={()=>{
+          if(form.contact&&form.contact.length>0&&form.contact.length<11){toast("Contact number must be exactly 11 digits!","err");return;}
+          onSave(form,isNew);
+        }}>💾 Save</button>
       </div>
     </div>
   );
@@ -1755,23 +1775,26 @@ function Reports({db}){
         </div>
         <div className="card" style={{padding:18}}>
           <h3 style={{fontWeight:700,marginBottom:14,fontSize:14}}>Transaction Log</h3>
-          <div className="twrap">
-            <table>
-              <thead><tr><th>Date</th><th>Time</th><th>Items</th><th>Total</th><th>Type</th></tr></thead>
-              <tbody>
-                {filtered.length===0&&<tr><td colSpan={5} style={{textAlign:"center",color:"var(--tx3)",padding:24}}>No transactions in this period.</td></tr>}
-                {filtered.slice(0,50).map(t=>(
-                  <tr key={t.id}>
-                    <td style={{fontSize:12,whiteSpace:"nowrap"}}>{fmtDate(t.date)}</td>
-                    <td style={{fontSize:12,whiteSpace:"nowrap"}}>{fmtTime(t.date)}</td>
-                    <td style={{fontSize:12,maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.items?.map(i=>i.name).join(", ")}</td>
-                    <td style={{fontWeight:700,color:"var(--ac)"}}>{fmt(t.total)}</td>
-                    <td><span className={`badge ${t.isUtang?"bg-y":"bg-g"}`}>{t.isUtang?"Utang":"Cash"}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {filtered.length===0
+            ?<p style={{color:"var(--tx3)",fontSize:13,textAlign:"center",padding:"20px 0"}}>No transactions in this period.</p>
+            :filtered.slice(0,50).map(t=>(
+              <div key={t.id} style={{padding:"10px 0",borderBottom:"1px solid var(--bd)",display:"flex",flexDirection:"column",gap:4}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                  <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}>
+                    <span style={{fontSize:12,fontWeight:600,color:"var(--tx2)"}}>{fmtDate(t.date)}</span>
+                    <span style={{fontSize:11,color:"var(--tx3)"}}>{fmtTime(t.date)}</span>
+                    <span className={`badge ${t.isUtang?"bg-y":"bg-g"}`} style={{fontSize:11}}>{t.isUtang?"Utang":"Cash"}</span>
+                  </div>
+                  <span style={{fontWeight:800,color:"var(--ac)",fontSize:14,flexShrink:0}}>{fmt(t.total)}</span>
+                </div>
+                {t.items?.length>0&&(
+                  <div style={{fontSize:12,color:"var(--tx3)",lineHeight:1.5}}>
+                    {t.items.map(i=>`${i.name} ×${i.qty}`).join(" · ")}
+                  </div>
+                )}
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
@@ -1792,6 +1815,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
   const s=(k,v)=>setForm(p=>({...p,[k]:v}));
 
   const saveSettings=async()=>{
+    if(form.contact&&form.contact.length>0&&form.contact.length<11){toast("Contact number must be exactly 11 digits!","err");return;}
     const d=getLS();d.settings={...d.settings,...form};
     await saveData(d);toast("Settings saved! ✅");
   };
@@ -2092,6 +2116,32 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
           #reports-tab{display:block!important}
           #mob-reports-link{display:block!important}
           #mob-logout-store{display:block!important}
+        }
+        /* ── Dense mobile modules: edge-to-edge, zero gap ── */
+        @media(max-width:768px){
+          .pg-body{padding:0 0 80px!important}
+          /* All direct-child cards and wrappers: no side margins, no border-radius, thin separators */
+          .pg-body>*{margin-left:0!important;margin-right:0!important}
+          .pg-body>.card{border-radius:0!important;border-left:0!important;border-right:0!important;margin-bottom:2px!important}
+          /* Dashboard KPI wrapper */
+          .pg-body>[class=""]{padding:0!important}
+          /* Utang customer list gap */
+          .pg-body[style*="gap:12px"]{gap:2px!important}
+          /* Inventory card grid */
+          .pg-body [style*="minmax(280px"]{gap:2px!important;padding:0!important}
+          /* Reports stat grid */
+          .pg-body [style*="minmax(140px"]{gap:2px!important}
+          /* Inner card paddings: tighter */
+          .pg-body .card{padding:12px 14px!important}
+          .pg-body .sc{border-radius:0!important;border-left:0!important;border-right:0!important;margin:0!important}
+          /* Stock alert */
+          .pg-body [style*="borderRadius:16"]{border-radius:0!important;border-left:0!important;border-right:0!important;margin-left:0!important;margin-right:0!important;margin-bottom:2px!important}
+          /* Recent + best-selling grid */
+          .pg-body [style*="minmax(280px,1fr)"]{gap:2px!important}
+          /* Utang pg-body flex col gap */
+          .pg-body[style*="flex-direction:column"]{gap:2px!important;padding:0 0 80px!important}
+          /* POS body */
+          .pg-body[style*="padding:16px"]{padding:4px 0 80px!important}
         }
       `}</style>
     </div>
