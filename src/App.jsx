@@ -385,7 +385,7 @@ tr:hover td{background:var(--sf2)}
     padding:18px 18px!important;
   .cust-card{border-radius:0!important;border-left:none!important;border-right:none!important}
   .cust-row{border-radius:0!important}
-  .pg-body [style*="minmax(280px"]{gap:1px!important}
+  .pg-body [style*="minmax(280px"]{gap:8px!important}
   /* Dashboard recent+bestselling: keep a real gap on mobile */
   .dash-grid{gap:12px!important}
   /* Reports stat grid: keep gap */
@@ -1386,8 +1386,14 @@ function Inventory({db,saveData,setConfirm}){
     if(form.stock===""||isNaN(parseInt(form.stock))){toast("Enter stock quantity!","err");return;}
     const clean={...form,name:sanitize(form.name.trim()),price:parseFloat(form.price)||0,stock:parseInt(form.stock)||0};
     const d=getLS();
-    if(isNew)d.products=[{...clean,id:uid(),createdAt:new Date().toISOString()},...(d.products||[])];
-    else d.products=(d.products||[]).map(p=>p.id===clean.id?clean:p);
+    /* Duplicate name check — only when adding a new product */
+    if(isNew){
+      const exists=(d.products||[]).some(p=>p.name.trim().toLowerCase()===clean.name.toLowerCase());
+      if(exists){toast("Product already exists!","err");errBeep();return;}
+      d.products=[{...clean,id:uid(),createdAt:new Date().toISOString()},...(d.products||[])];
+    }else{
+      d.products=(d.products||[]).map(p=>p.id===clean.id?clean:p);
+    }
     await saveData(d);setModal(false);setEditP(null);
     toast(isNew?"Product added! ✅":"Product updated! ✅");okBeep();
   };
@@ -1421,7 +1427,7 @@ function Inventory({db,saveData,setConfirm}){
           {filtered.length===0&&(
             <div className="card" style={{padding:32,textAlign:"center",color:"var(--tx3)"}}>No products found.</div>
           )}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:12}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:2}}>
             {filtered.map(p=>{
               const thresh=db.settings?.lowStockThreshold||5;
               const isOut=p.stock<=0;
@@ -1561,8 +1567,14 @@ function Utang({db,saveData,setConfirm}){
     if(!form.name?.trim()){toast("Name is required!","err");return;}
     const clean={...form,name:sanitize(form.name.trim()),contact:sanitize(form.contact||""),address:sanitize(form.address||"")};
     const d=getLS();
-    if(isNew)d.customers=[{...clean,id:uid(),balance:0,createdAt:new Date().toISOString()},...(d.customers||[])];
-    else d.customers=(d.customers||[]).map(c=>c.id===clean.id?{...c,...clean}:c);
+    /* Duplicate name check — only when adding a new customer */
+    if(isNew){
+      const exists=(d.customers||[]).some(c=>c.name.trim().toLowerCase()===clean.name.toLowerCase());
+      if(exists){toast("Customer already exists!","err");errBeep();return;}
+      d.customers=[{...clean,id:uid(),balance:0,createdAt:new Date().toISOString()},...(d.customers||[])];
+    }else{
+      d.customers=(d.customers||[]).map(c=>c.id===clean.id?{...c,...clean}:c);
+    }
     await saveData(d);setCustModal(false);setEditCust(null);
     toast(isNew?"Customer added!":"Customer updated!");
   };
