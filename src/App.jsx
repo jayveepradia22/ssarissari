@@ -66,7 +66,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   font-family:'Poppins',sans-serif;
   background:var(--bg);color:var(--tx);
   display:flex;flex-direction:column;
-  width:100vw;height:102dvh;
+  width:100vw;height:100dvh;
   overflow:hidden;
   position: fixed;
   transition:background .25s,color .25s}
@@ -686,7 +686,7 @@ export default function App(){
       <div className="card" style={{width:"100%",maxWidth:380,padding:"36px 28px"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
           <div style={{width:70,height:70,background:"var(--acl)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:34}}>🏪</div>
-          <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>Ligaya's Sari-Sari Store</h1>
+          <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>Ligaya's Store</h1>
           <p style={{color:"var(--tx2)",fontSize:13,fontWeight:500}}>Store Management System</p>
         </div>
         {loginF.err&&<div style={{background:"var(--dnl)",color:"var(--dn)",borderRadius:"var(--rs)",padding:"9px 14px",marginBottom:14,fontSize:13,fontWeight:500}}>❌ {loginF.err}</div>}
