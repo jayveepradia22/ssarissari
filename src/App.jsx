@@ -96,8 +96,8 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 
 .pg-hdr{
   flex-shrink:0;background:var(--sf);
-  padding:14px 16px 10px;
-  border-bottom:1px solid var(--bd);
+  padding:12px 16px 12px !important;
+  border-bottom:1.5px solid var(--bd);
   z-index:10;transition:background .25s;
   overflow-x:hidden}
 @media(max-width:768px){.pg-hdr{padding:10px 16px 8px}}
@@ -106,7 +106,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  padding:16px;
+  padding:1px;
   background:var(--bg)}
 @media(max-width:768px){
   .pg-body{padding:0;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}}
@@ -144,7 +144,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   flex:1;position:relative;
   display:flex;flex-direction:column;
   align-items:center;justify-content:flex-end;
-  padding-bottom:6px;
+  padding-bottom:33px;
   overflow:visible}
 .ntab-pos{
   position:absolute;top:-25px;left:50%;transform:translateX(-50%);
@@ -155,11 +155,11 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   background:var(--ac);color:#fff;
   display:flex;align-items:center;justify-content:center;
   font-size:26px;line-height:1;
-  box-shadow:0 4px 18px rgba(45,106,79,.4);
+  box-shadow:0 4px 18px rgba(9, 17, 13, 0.4);
   border:5px solid var(--bg);
   transition:transform .18s,box-shadow .18s}
 .ntab-pos:active .ntab-pos-bubble{transform:scale(.92)}
-.ntab-pos.on .ntab-pos-bubble{background:var(--ac2);box-shadow:0 4px 22px rgba(45,106,79,.55)}
+.ntab-pos.on .ntab-pos-bubble{background:var(--ac2);box-shadow:0 4px 22px rgba(14, 22, 18, 0.55)}
 .ntab-pos-label{font-size:10px;font-weight:700;color:var(--ac);margin-top:30px;line-height:1}
 .ntab-pos.on .ntab-pos-label{color:var(--ac2)}
 
@@ -208,7 +208,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 .shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 18px}
 
 /* ─── FORMS ─────────────────────────────────────────────── */
-.fg{margin-bottom:15px}
+.fg{margin-bottom:10px}
 .fg label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:6px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:500px){.frow{grid-template-columns:1fr}}
@@ -263,7 +263,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 /* ─── PRODUCT CARDS ─────────────────────────────────────── */
 .pcard{
   background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
-  padding:14px 10px;cursor:pointer;transition:all .18s;text-align:center;user-select:none}
+  padding:8px 8px;cursor:pointer;transition:all .18s;text-align:center;user-select:none}
 .pcard:hover{border-color:var(--ac);background:var(--acl);transform:translateY(-1px)}
 .pcard:active{transform:scale(.97)}
 
@@ -316,7 +316,7 @@ tr:hover td{background:var(--sf2)}
   display:none;position:fixed;bottom:calc(var(--nav-h) + 10px);right:16px;
   z-index:1000;
   width:52px;height:52px;border-radius:50%;background:var(--ac);color:#fff;
-  font-size:22px;box-shadow:0 4px 18px rgba(0,0,0,.22);
+  font-size:22px;box-shadow:0 4px 18px rgba(201, 119, 119, 0.22);
   align-items:center;justify-content:center;
   flex-direction:column;gap:0;border:none;cursor:pointer}
 .cart-fab:active{transform:scale(.93)}
@@ -902,14 +902,14 @@ function Dashboard({db,setPage}){
       {/* Scrollable body */}
       <div className="pg-body">
         {/* KPI Cards 2x2 grid */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,padding:"0 0"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,marginTop:10,padding:"0 0"}}>
           {[
             {label:"Today's Sales",  value:fmt(daySales),    icon:"💵", color:"var(--ac)",   bg:"rgba(82,183,136,0.08)",  border:"rgba(82,183,136,0.25)"},
             {label:"Transactions",   value:todayTx.length,   icon:"🧾", color:"var(--in)",   bg:"rgba(86,173,245,0.08)",  border:"rgba(86,173,245,0.25)"},
             {label:"Total Products", value:prods.length,     icon:"📦", color:"#b07ef8",     bg:"rgba(176,126,248,0.08)", border:"rgba(176,126,248,0.25)"},
             {label:"Total Utang",    value:fmt(totalUtang),  icon:"📋", color:"var(--wn)",   bg:"rgba(240,165,0,0.08)",   border:"rgba(240,165,0,0.25)"},
           ].map((s,i)=>(
-            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:16,padding:"16px 14px",display:"flex",flexDirection:"column",gap:4}}>
+            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:16,padding:"16px 15px",display:"flex",flexDirection:"column",gap:4}}>
               <div style={{fontSize:24}}>{s.icon}</div>
               <div style={{fontSize:20,fontWeight:800,lineHeight:1,color:s.color,marginTop:2}}>{s.value}</div>
               <div style={{fontSize:11,color:"var(--tx2)",fontWeight:500}}>{s.label}</div>
@@ -948,9 +948,9 @@ function Dashboard({db,setPage}){
 
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
           <div className="card" style={{padding:18}}>
-            <h3 style={{fontSize:14,fontWeight:700,marginBottom:14}}>Recent Transactions</h3>
+            <h3 style={{fontSize:14,fontWeight:600,marginBottom:14}}>Recent Transactions</h3>
             {recent.length===0?<p style={{color:"var(--tx3)",fontSize:13}}>No transactions yet.</p>:recent.map(t=>(
-              <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid var(--bd)"}}>
+              <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid var(--bd)"}}>
                 <div>
                   <div style={{fontSize:13,fontWeight:600}}>{t.items?.length||0} item{t.items?.length!==1?"s":""}{t.isUtang?" · Utang":""}</div>
                   <div style={{fontSize:11,color:"var(--tx3)"}}>{fmtDate(t.date)} {fmtTime(t.date)}</div>
@@ -960,9 +960,9 @@ function Dashboard({db,setPage}){
             ))}
           </div>
           <div className="card" style={{padding:18}}>
-            <h3 style={{fontSize:14,fontWeight:700,marginBottom:14}}>Best Selling Products</h3>
+            <h3 style={{fontSize:14,fontWeight:600,marginBottom:14}}>Best Selling Products</h3>
             {best.length===0?<p style={{color:"var(--tx3)",fontSize:13}}>No sales yet.</p>:best.map((p,i)=>(
-              <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid var(--bd)"}}>
+              <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"5px 0",borderBottom:"1px solid var(--bd)"}}>
                 <div style={{width:24,height:24,borderRadius:"50%",background:"var(--acl)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,color:"var(--ac)",flexShrink:0}}>{i+1}</div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
@@ -1281,7 +1281,7 @@ function POS({db,saveData,setConfirm}){
           </div>
         </div>
 
-        <div className="pg-body" style={{display:"flex",flexDirection:"column",padding:16}}>
+        <div className="pg-body" style={{display:"flex",flexDirection:"column",padding:5}}>
           <div className="pos-grid" style={{flex:1,minHeight:0}}>
             <div style={{display:"flex",flexDirection:"column",minHeight:0}}>
               <div style={{overflowY:"auto",flex:1}}>
@@ -1706,7 +1706,7 @@ function Utang({db,saveData,setConfirm}){
         </div>
 
         {/* Customer list — scrollable */}
-        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:3}}>
+        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:1}}>
           {filteredCustomers.length===0&&(
             <div className="cust-card" style={{padding:"28px 16px",textAlign:"center",color:"var(--tx3)",fontSize:14}}>
               {search?"No customers match your search.":"No customers yet."}
@@ -1894,7 +1894,7 @@ function Reports({db}){
           ))}
         </div>
         <div className="card" style={{padding:18}}>
-          <h3 style={{fontWeight:700,marginBottom:14,fontSize:14}}>Transaction Log</h3>
+          <h3 style={{fontWeight:700,marginBottom:4,fontSize:14}}>Transaction Log</h3>
           {filtered.length===0
             ?<p style={{color:"var(--tx3)",fontSize:13,textAlign:"center",padding:"20px 0"}}>No transactions in this period.</p>
             :filtered.slice(0,50).map(t=>(
