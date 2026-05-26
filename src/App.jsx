@@ -1,4 +1,3 @@
-import { db } from './firebaseConfig';
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 /* ── FONT ── */
@@ -67,7 +66,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   font-family:'Poppins',sans-serif;
   background:var(--bg);color:var(--tx);
   display:flex;flex-direction:column;
-  width:100vw;height:100vh;
+  width:100vw;height:102dvh;
   overflow:hidden;
   position: fixed;
   transition:background .25s,color .25s}
@@ -108,7 +107,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   padding-bottom: 0px !important;
-  padding:1px;
+  padding:10px 2px;
   background:var(--bg)}
 @media(max-width:768px){
   .pg-body{padding:0;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}}
@@ -152,6 +151,8 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   position:absolute;top:-25px;left:50%;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:3px;
   border:none;background:none;cursor:pointer;padding:0;z-index:1000}
+.ntab-pos:active{transform:translateX(-50%)}
+
 .ntab-pos-bubble{
   width:56px;height:56px;border-radius:50%;
   background:var(--ac);color:#fff;
@@ -311,7 +312,11 @@ tr:hover td{background:var(--sf2)}
 /* ─── POS GRID ──────────────────────────────────────────── */
 .pos-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;height:100%;min-height:0}
 @media(max-width:1000px){.pos-grid{grid-template-columns:1fr 280px}}
-@media(max-width:768px){.pos-grid{display:flex;flex-direction:column;height:auto;gap:0}}
+@media(max-width:768px){
+  /* On mobile: single column — cart panel hidden (FAB+drawer handles it) */
+  .pos-grid{display:block;height:auto}
+  .pos-cart-col{display:none!important}
+}
 
 /* ─── MOBILE CART DRAWER ────────────────────────────────── */
 .cart-fab{
@@ -372,9 +377,19 @@ tr:hover td{background:var(--sf2)}
     border-radius:0!important;
     border-left:none!important;border-right:none!important;
     padding:10px 12px!important;margin:0!important;box-shadow:none!important}
+  /* Exempt Reports stat cards from the edge-to-edge strip */
+  .rpt-stats .sc{
+    border-radius:var(--r)!important;
+    border-left:1.5px solid var(--bd)!important;
+    border-right:1.5px solid var(--bd)!important;
+    padding:18px 18px!important;
   .cust-card{border-radius:0!important;border-left:none!important;border-right:none!important}
   .cust-row{border-radius:0!important}
   .pg-body [style*="minmax(280px"]{gap:1px!important}
+  /* Dashboard recent+bestselling: keep a real gap on mobile */
+  .dash-grid{gap:12px!important}
+  /* Reports stat grid: keep gap */
+  .rpt-stats{gap:8px!important;padding:0 16px!important}
   .pg-body [style*="minmax(140px"]{gap:2px!important}
   .pg-body [style*="borderRadius:16"]{
     border-radius:0!important;
@@ -723,19 +738,15 @@ export default function App(){
 
   const logout=()=>setConfirm({title:"Log Out",msg:"Are you sure you want to log out?",icon:"🚪",danger:true,confirmText:"Log Out",
     onConfirm:()=>{
-      /* Wipe session + auth creds from memory */
       sessionStorage.removeItem("sari_auth");
       sessionStorage.clear();
-      /* Clear any sensitive auth keys from localStorage (keep store data) */
       try{localStorage.removeItem("sari_auth");}catch{}
-      /* Reset all auth state */
       setLoggedIn(false);
       setPinOk(false);
       setPinShow(false);
       setPinEntry("");
       setAuthCreds({u:"",p:""});
       setLoginF({u:"",p:"",showP:false,err:""});
-      /* Replace history so back button can't return to dashboard */
       window.history.replaceState({},"");
     }
   });
@@ -904,7 +915,7 @@ function Dashboard({db,setPage}){
       {/* Scrollable body */}
       <div className="pg-body">
         {/* KPI Cards 2x2 grid */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,marginTop:10,padding:"0 0"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,marginTop:8,padding:"0 0"}}>
           {[
             {label:"Today's Sales",  value:fmt(daySales),    icon:"💵", color:"var(--ac)",   bg:"rgba(82,183,136,0.08)",  border:"rgba(82,183,136,0.25)"},
             {label:"Transactions",   value:todayTx.length,   icon:"🧾", color:"var(--in)",   bg:"rgba(86,173,245,0.08)",  border:"rgba(86,173,245,0.25)"},
@@ -948,7 +959,7 @@ function Dashboard({db,setPage}){
           </div>
         )}
 
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
+        <div className="dash-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
           <div className="card" style={{padding:18}}>
             <h3 style={{fontSize:14,fontWeight:600,marginBottom:14}}>Recent Transactions</h3>
             {recent.length===0?<p style={{color:"var(--tx3)",fontSize:13}}>No transactions yet.</p>:recent.map(t=>(
@@ -1300,7 +1311,7 @@ function POS({db,saveData,setConfirm}){
                 </div>
               </div>
             </div>
-            <div className="card" style={{display:"flex",flexDirection:"column",overflow:"hidden",padding:18}}>
+            <div className="card pos-cart-col" style={{display:"flex",flexDirection:"column",overflow:"hidden",padding:18}}>
               <CartContent/>
             </div>
           </div>
@@ -1874,7 +1885,7 @@ function Reports({db}){
       </div>
 
       <div className="pg-body">
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginBottom:20}}>
+        <div className="rpt-stats" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:5,marginTop:10,marginBottom:20}}>
           <div className="sc"><div style={{fontSize:24}}>💵</div><div className="sn" style={{color:"var(--ac)"}}>{fmt(cashSales)}</div><div className="sl">Cash Sales</div></div>
           <div className="sc"><div style={{fontSize:24}}>🧾</div><div className="sn" style={{color:"var(--in)"}}>{filtered.length}</div><div className="sl">Transactions</div></div>
           <div className="sc"><div style={{fontSize:24}}>📋</div><div className="sn" style={{color:"var(--wn)"}}>{fmt(utangSales)}</div><div className="sl">On Credit</div></div>
