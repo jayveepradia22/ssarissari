@@ -1,4 +1,4 @@
-import { db } from './firebaseConfig';
+import { db } from './firebaseconfig';
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 
 /* ── FONT ── */
