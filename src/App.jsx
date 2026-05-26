@@ -67,8 +67,9 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   font-family:'Poppins',sans-serif;
   background:var(--bg);color:var(--tx);
   display:flex;flex-direction:column;
-  width:100vw;height:100dvh;
+  width:100vw;height:100vh;
   overflow:hidden;
+  position: fixed;
   transition:background .25s,color .25s}
 
 /* ─── LAYOUT TREE ───────────────────────────────────────────
@@ -106,6 +107,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  padding-bottom: 0px !important;
   padding:1px;
   background:var(--bg)}
 @media(max-width:768px){
@@ -1394,12 +1396,12 @@ function Inventory({db,saveData,setConfirm}){
 
       <div className="pg-page">
         <div className="pg-hdr">
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:10}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,flexWrap:"wrap",gap:10}}>
             <h1 style={{fontSize:19,fontWeight:800}}>📦 Inventory</h1>
             <button className="btn bp bsm" onClick={()=>{setEditP(null);setModal(true);}}>+ Add Product</button>
           </div>
           <SearchBar value={search} onChange={setSearch} placeholder="Search products…"/>
-          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
+          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
             {usedCats.map(c=><button key={c} className={`btn bsm ${catF===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatF(c)}>{c}</button>)}
           </div>
         </div>
@@ -1438,7 +1440,7 @@ function InventoryCard({p,stockColor,stockBg,stockLabel,onEdit,onDelete}){
     return()=>{document.removeEventListener("mousedown",h);document.removeEventListener("touchstart",h);};
   },[menuOpen]);
   return(
-    <div className="card" style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:14,position:"relative"}}>
+    <div className="card" style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:5,position:"relative"}}>
       <div style={{width:46,height:46,borderRadius:12,background:"var(--sf2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>
         {CAT_EMOJI(p.category)}
       </div>
