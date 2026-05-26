@@ -9,12 +9,26 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
   document.head.appendChild(fl);
 }
 
-/* ── GLOBAL CSS ── */
+/* ── GLOBAL CSS — single authoritative stylesheet, no secondary <style> tags ── */
 {
   const gs=document.createElement("style");
   gs.textContent=`
+
+/* ─── RESET ────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Poppins',sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+
+/* ─── SCROLLBAR: globally invisible ───────────────────── */
+::-webkit-scrollbar{display:none!important}
+*{scrollbar-width:none;-ms-overflow-style:none}
+
+/* ─── ROOT / THEME ─────────────────────────────────────── */
+html,body{
+  height:100dvh;width:100vw;
+  font-family:'Poppins',sans-serif;
+  -webkit-tap-highlight-color:transparent;
+  overflow:hidden;
+  background:var(--bg)}
+
 :root{
   --bg:#f5f4f0;--sf:#fff;--sf2:#eeece8;--bd:#e2dfd8;
   --tx:#18160f;--tx2:#6a6358;--tx3:#aca59b;
@@ -23,7 +37,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;-webkit-tap-highlight-col
   --wn:#c87800;--wnl:#fff3cd;
   --in:#1a6db5;--inl:#e3f0fd;
   --r:14px;--rs:9px;
-  --sh:0 1px 8px rgba(0,0,0,.07);--shlg:0 8px 32px rgba(0,0,0,.13)
+  --sh:0 1px 8px rgba(0,0,0,.07);--shlg:0 8px 32px rgba(0,0,0,.13);
+  --nav-h:62px
 }
 .dark{
   --bg:#111109;--sf:#1c1b17;--sf2:#252420;--bd:#333028;
@@ -34,8 +49,8 @@ html,body{height:100%;font-family:'Poppins',sans-serif;-webkit-tap-highlight-col
   --in:#56adf5;--inl:#0d1e33;
   --sh:0 1px 8px rgba(0,0,0,.3);--shlg:0 8px 32px rgba(0,0,0,.5)
 }
-.app-root{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--tx);
-  display:flex;flex-direction:column;min-height:100vh;transition:background .25s,color .25s}
+
+/* ─── BASE ELEMENTS ─────────────────────────────────────── */
 input,select,textarea,button{font-family:'Poppins',sans-serif}
 button{cursor:pointer;transition:all .18s;border:none;background:none}
 button:active{transform:scale(.97)}
@@ -45,21 +60,118 @@ input,select,textarea{
   transition:border .18s,box-shadow .18s;-webkit-appearance:none;appearance:none}
 input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acl)}
 input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointer;flex-shrink:0}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
-.no-scrollbar{scrollbar-width:none;-ms-overflow-style:none}
-.no-scrollbar::-webkit-scrollbar{display:none}
-/* Horizontal pill-row scrollbar — invisible */
-.hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-.hscroll::-webkit-scrollbar{display:none}
 
-/* Hide horizontal scrollbars globally on all sections */
-.tabs{scrollbar-width:none;-ms-overflow-style:none}
-.tabs::-webkit-scrollbar{display:none}
-.pg-hdr [style*="overflow-x"]{scrollbar-width:none;-ms-overflow-style:none}
-.pg-hdr [style*="overflow-x"]::-webkit-scrollbar{display:none}
+/* ─── APP SHELL ─────────────────────────────────────────── */
+/* Single 100dvh column; topbar (mobile) + mwrap fills the rest */
+.app-root{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);color:var(--tx);
+  display:flex;flex-direction:column;
+  width:100vw;height:100dvh;
+  overflow:hidden;
+  transition:background .25s,color .25s}
 
+/* ─── LAYOUT TREE ───────────────────────────────────────────
+   .app-root  (flex col, 100dvh, overflow:hidden)
+     .topbar   (mobile, flex-shrink:0)
+     .mwrap    (flex:1, min-height:0, overflow:hidden)
+       .sidebar   (desktop, 220px, own scroll, z-index:50)
+       .pbody     (flex:1, overflow:hidden — size anchor only)
+         .pg-page  (flex col, height:100%, overflow:hidden)
+           .pg-hdr  (flex-shrink:0 — pinned, never scrolls)
+           .pg-body (flex:1, overflow-y:auto — ONLY scroll region)
+     .botnav   (fixed, bottom:0, z-index:999, mobile only)
+──────────────────────────────────────────────────────────── */
+.mwrap{display:flex;flex:1;min-height:0;overflow:hidden;width:100%}
+
+.sidebar{
+  width:220px;background:var(--sf);border-right:1.5px solid var(--bd);
+  display:flex;flex-direction:column;padding:16px 10px;flex-shrink:0;
+  overflow-y:auto;height:100%;z-index:50}
+@media(max-width:768px){.sidebar{display:none}}
+
+.pbody{flex:1;overflow:hidden;min-width:0;height:100%;display:flex;flex-direction:column}
+
+.pg-page{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden;background:var(--bg)}
+
+.pg-hdr{
+  flex-shrink:0;background:var(--sf);
+  padding:14px 16px 10px;
+  border-bottom:1px solid var(--bd);
+  z-index:10;transition:background .25s;
+  overflow-x:hidden}
+@media(max-width:768px){.pg-hdr{padding:10px 16px 8px}}
+
+.pg-body{
+  flex:1;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:16px;
+  background:var(--bg)}
+@media(max-width:768px){
+  .pg-body{padding:0;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}}
+
+/* ─── TOPBAR (mobile) ───────────────────────────────────── */
+.topbar{
+  display:none;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:var(--sf);border-bottom:1.5px solid var(--bd);
+  z-index:100;gap:8px;flex-shrink:0;width:100%}
+@media(max-width:768px){.topbar{display:flex}}
+
+/* ─── BOTTOM NAV (mobile) ───────────────────────────────── */
+/* z-index:999, fixed, overflow:visible so the FAB can bleed upward */
+.botnav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--nav-h);
+  background:var(--sf);border-top:1.5px solid var(--bd);
+  z-index:999;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  align-items:flex-end;justify-content:space-around;
+  overflow:visible}
+@media(max-width:768px){.botnav{display:flex}}
+
+.ntab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 4px;font-size:10px;font-weight:600;
+  color:var(--tx3);background:none;border:none;border-radius:0}
+.ntab.on{color:var(--ac)}
+.ntab span{font-size:22px;line-height:1}
+
+/* POS FAB — position:absolute, top:-25px, z-index:1000
+   Parent .ntab-pos-wrap must be overflow:visible */
+.ntab-pos-wrap{
+  flex:1;position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;
+  padding-bottom:6px;
+  overflow:visible}
+.ntab-pos{
+  position:absolute;top:-25px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  border:none;background:none;cursor:pointer;padding:0;z-index:1000}
+.ntab-pos-bubble{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--ac);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;line-height:1;
+  box-shadow:0 4px 18px rgba(45,106,79,.4);
+  border:5px solid var(--bg);
+  transition:transform .18s,box-shadow .18s}
+.ntab-pos:active .ntab-pos-bubble{transform:scale(.92)}
+.ntab-pos.on .ntab-pos-bubble{background:var(--ac2);box-shadow:0 4px 22px rgba(45,106,79,.55)}
+.ntab-pos-label{font-size:10px;font-weight:700;color:var(--ac);margin-top:30px;line-height:1}
+.ntab-pos.on .ntab-pos-label{color:var(--ac2)}
+
+/* ─── SIDEBAR ITEMS ─────────────────────────────────────── */
+.siditem{
+  display:flex;align-items:center;gap:11px;padding:11px 12px;
+  border-radius:10px;cursor:pointer;transition:all .18s;
+  color:var(--tx2);font-size:14px;font-weight:500;margin-bottom:2px}
+.siditem:hover{background:var(--sf2);color:var(--tx)}
+.siditem.on{background:var(--acl);color:var(--ac)}
+
+/* ─── BUTTONS ───────────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
   padding:11px 20px;border-radius:var(--rs);font-size:14px;font-weight:600;
   cursor:pointer;transition:all .18s;white-space:nowrap;border:none}
@@ -69,6 +181,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 .bsm{padding:7px 13px;font-size:13px;border-radius:7px}
 .blg{padding:14px 28px;font-size:15px;border-radius:var(--r)}
 
+/* ─── CARDS / BADGES ────────────────────────────────────── */
 .card{background:var(--sf);border-radius:var(--r);border:1.5px solid var(--bd);box-shadow:var(--sh)}
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
 .bg-g{background:var(--acl);color:var(--ac)}
@@ -76,116 +189,85 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 .bg-y{background:var(--wnl);color:var(--wn)}
 .bg-b{background:var(--inl);color:var(--in)}
 
-.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:200;
-  display:flex;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(3px)}
+/* ─── MODALS ────────────────────────────────────────────── */
+/* Checkout panel: fixed, full screen, z-index:2000 */
+.backdrop{
+  position:fixed;inset:0;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.52);
+  z-index:2000;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:0;backdrop-filter:blur(3px)}
 @media(min-width:600px){.backdrop{align-items:center;padding:16px}}
-.msheet{background:var(--sf);width:100%;max-width:560px;
-  border-radius:24px 24px 0 0;max-height:92vh;overflow-y:auto;
+.msheet{
+  background:var(--sf);width:100%;
+  border-radius:24px 24px 0 0;max-height:92dvh;overflow-y:auto;
   box-shadow:var(--shlg);animation:shUp .22s ease;padding:24px 20px 32px}
-@media(min-width:600px){.msheet{border-radius:var(--r);max-height:88vh;padding:28px}}
+@media(min-width:600px){.msheet{border-radius:var(--r);max-height:88dvh;padding:28px}}
 .mlg{max-width:680px}
 @keyframes shUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 .shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 18px}
 
+/* ─── FORMS ─────────────────────────────────────────────── */
 .fg{margin-bottom:15px}
 .fg label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:6px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:500px){.frow{grid-template-columns:1fr}}
+.login-wrap .fg label{text-align:left}
 
-/* ═══════════════════════════════════════════
-   LAYOUT — Two-level scroll architecture
-   ───────────────────────────────────────────
-   Level 1: app-root (column, 100dvh, no overflow)
-     ├─ .topbar  (mobile, flex-shrink:0, never scrolls)
-     ├─ .mwrap   (flex row, flex:1, min-height:0 — fills remaining space)
-     │   ├─ .sidebar  (desktop, fixed width, own scroll)
-     │   └─ .pbody    (flex:1 — NOT a scroll container; just a size anchor)
-     │       └─ .pg-page  (flex column, height:100% of pbody)
-     │           ├─ .pg-hdr   (flex-shrink:0 — never scrolls, always visible)
-     │           └─ .pg-body  (flex:1, overflow-y:auto — THE scroll region)
-     └─ .botnav  (mobile, fixed, never in flow)
+/* ─── TABS ──────────────────────────────────────────────── */
+.tabs{
+  display:flex;margin-bottom:0;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  gap:4px;padding:4px 0;border:none!important}
+.tabi{
+  padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--tx2);border-radius:20px;transition:all .18s;white-space:nowrap;
+  border:none;background:none;line-height:1.4}
+.tabi:hover{background:var(--sf2);color:var(--tx)}
+.tabi.on{color:var(--ac);background:var(--acl)}
 
-   KEY INSIGHT: .pbody does NOT scroll. Each page component is a flex column
-   that fills .pbody exactly. The header (pg-hdr) is flex-shrink:0 so it keeps
-   its natural height. The body (pg-body) is flex:1 + overflow-y:auto so it
-   takes ALL remaining space and scrolls within it. The scrollbar appears only
-   in the content area — never behind or over the header. No sticky, no z-index
-   tricks, no box-shadow masking needed.
-═══════════════════════════════════════════ */
+/* ─── SEARCH BAR ────────────────────────────────────────── */
+.sbar{position:relative}
+.sbar input{padding:8px 32px 8px 36px;font-size:13px;height:36px}
+.sbic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px;pointer-events:none;z-index:1}
+.sbar-x{
+  position:absolute;right:7px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--tx3);font-size:13px;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;padding:0;transition:all .15s}
+.sbar-x:hover{background:var(--bd);color:var(--tx)}
 
-.mwrap{display:flex;flex:1;min-height:0;overflow:hidden}
-.sidebar{width:220px;background:var(--sf);border-right:1.5px solid var(--bd);
-  display:flex;flex-direction:column;padding:16px 10px;flex-shrink:0;overflow-y:auto;
-  height:100%;z-index:50}
-@media(max-width:768px){.sidebar{display:none}}
+/* ─── CUSTOMER CARDS ────────────────────────────────────── */
+.cust-card{
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
+  overflow:visible;transition:box-shadow .18s}
+.cust-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.09)}
+.cust-row{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  cursor:pointer;user-select:none;border-radius:var(--rs);
+  transition:background .15s}
+.cust-row:hover{background:var(--sf2)}
+.cust-actions{
+  display:flex;gap:8px;padding:10px 14px 12px;flex-wrap:wrap;
+  border-top:1px solid var(--bd);animation:shUp .15s ease}
 
-/* pbody: size anchor only — does NOT scroll */
-.pbody{flex:1;overflow:hidden;min-width:0;height:100%;display:flex;flex-direction:column}
-
-/* pg-page: fills pbody, flex column — header + body */
-.pg-page{display:flex;flex-direction:column;flex:1;min-height:0;height:100%}
-
-/* pg-hdr: never scrolls, always on top, solid background */
-.pg-hdr{
-  flex-shrink:0;
-  background:var(--sf);
-  padding:18px 24px 14px;
-  border-bottom:1.5px solid var(--bd);
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-  z-index:10;
-  transition:background .25s}
-@media(max-width:768px){.pg-hdr{padding:10px 12px 8px}}
-
-/* pg-body: THE scroll container — all page content lives here */
-.pg-body{
-  flex:1;
-  overflow-y:auto;
-  overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  padding:24px;
-  background:var(--bg);
-  min-height:0}
-@media(max-width:768px){.pg-body{padding:6px 0 80px;background:var(--bg)}}
-
-.topbar{display:none;align-items:center;justify-content:space-between;
-  padding:13px 18px;background:var(--sf);border-bottom:1.5px solid var(--bd);
-  z-index:100;gap:8px;flex-shrink:0}
-@media(max-width:768px){.topbar{display:flex}}
-
-.botnav{display:none;position:fixed;bottom:0;left:0;right:0;
-  background:var(--sf);border-top:1.5px solid var(--bd);
-  z-index:100;padding:4px 0 max(4px,env(safe-area-inset-bottom))}
-@media(max-width:768px){.botnav{display:flex}}
-.ntab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 4px;font-size:10px;font-weight:600;color:var(--tx3);background:none;border:none;border-radius:0}
-.ntab.on{color:var(--ac)}
-.ntab span{font-size:22px;line-height:1}
-.siditem{display:flex;align-items:center;gap:11px;padding:11px 12px;
-  border-radius:10px;cursor:pointer;transition:all .18s;
-  color:var(--tx2);font-size:14px;font-weight:500;margin-bottom:2px}
-.siditem:hover{background:var(--sf2);color:var(--tx)}
-.siditem.on{background:var(--acl);color:var(--ac)}
-
-.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--ac);
-  margin:0 5px;transition:background .18s}
-.pin-dot.on{background:var(--ac)}
-.pin-key{width:68px;height:68px;border-radius:50%;font-size:22px;font-weight:700;
-  background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx)}
-.pin-key:hover{background:var(--acl);border-color:var(--ac);color:var(--ac)}
-@media(max-width:380px){.pin-key{width:58px;height:58px;font-size:19px}}
-
-.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:9999;
+/* ─── TOAST ─────────────────────────────────────────────── */
+.toast{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  z-index:9999;
   background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
   padding:12px 20px;box-shadow:var(--shlg);font-size:14px;font-weight:500;
   display:flex;align-items:center;gap:9px;animation:toIn .28s ease;
   max-width:92vw;white-space:nowrap;pointer-events:none}
 @keyframes toIn{from{transform:translateX(-50%) translateY(-12px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 
-.pcard{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
+/* ─── PRODUCT CARDS ─────────────────────────────────────── */
+.pcard{
+  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
   padding:14px 10px;cursor:pointer;transition:all .18s;text-align:center;user-select:none}
 .pcard:hover{border-color:var(--ac);background:var(--acl);transform:translateY(-1px)}
 .pcard:active{transform:scale(.97)}
 
+/* ─── TABLES ────────────────────────────────────────────── */
 .twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r)}
 table{width:100%;border-collapse:collapse;font-size:14px;min-width:360px}
 th{background:var(--sf2);color:var(--tx2);font-size:11px;font-weight:700;
@@ -193,65 +275,29 @@ th{background:var(--sf2);color:var(--tx2);font-size:11px;font-weight:700;
 td{padding:12px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--sf2)}
-
-/* sticky table header inside .card */
 .sticky-th th{position:sticky;top:0;z-index:10;background:var(--sf2)}
 
+/* ─── STATS / PROGRESS ──────────────────────────────────── */
 .pw{background:var(--sf2);border-radius:20px;height:7px;overflow:hidden}
 .pb{height:100%;border-radius:20px;background:var(--ac);transition:width .4s}
 .sc{background:var(--sf);border-radius:var(--r);padding:18px 16px;border:1.5px solid var(--bd);box-shadow:var(--sh)}
 .sn{font-size:26px;font-weight:800;line-height:1;margin-top:6px}
 .sl{font-size:12px;color:var(--tx2);margin-top:3px;font-weight:500}
 
+/* ─── MISC ──────────────────────────────────────────────── */
 .rfont{font-family:'Courier New',monospace;font-size:13px;line-height:1.7}
+.hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sdot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sdot.off{background:var(--wn)!important;animation:none}
+.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--ac);margin:0 5px;transition:background .18s}
+.pin-dot.on{background:var(--ac)}
+.pin-key{width:68px;height:68px;border-radius:50%;font-size:22px;font-weight:700;background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx)}
+.pin-key:hover{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+@media(max-width:380px){.pin-key{width:58px;height:58px;font-size:19px}}
 @media print{body *{visibility:hidden}.printable,.printable *{visibility:visible}.printable{position:fixed;inset:0;padding:20px}}
 
-/* ── MOBILE DENSE LAYOUT ──────────────────────────────────
-   Edge-to-edge, zero-gap modules for all sections on mobile
-───────────────────────────────────────────────────────── */
-@media(max-width:768px){
-  /* Cards stretch edge-to-edge with no side margins */
-  .pg-body>.card,
-  .pg-body>div>.card{
-    border-radius:0!important;
-    border-left:none!important;
-    border-right:none!important;
-    margin:0!important;
-  }
-  /* Stack sections with only a thin divider, no gap */
-  .pg-body{display:block}
-  /* Dashboard KPI grid — fill width */
-  .pg-body>[style*="grid-template-columns:\"1fr 1fr\""],
-  .pg-body [style*="gridTemplateColumns:\"1fr 1fr\""]{
-    gap:2px!important;
-  }
-  /* Utang customer cards: no side gaps, minimal vertical gap */
-  .pg-body>.card+.card{margin-top:2px!important}
-  /* Inventory cards: tighter */
-  .pg-body [style*="minmax(280px"]{gap:2px!important}
-  /* KPI/stat cards: denser */
-  .sc{padding:10px 12px!important;border-radius:0!important;border-left:none!important;border-right:none!important}
-  /* Reduce internal padding on all cards in mobile */
-  .card{padding:12px!important}
-  /* Bottom nav spacing for dense body */
-}
-
-.sbar{position:relative}
-.sbar input{padding-left:40px;padding-right:36px}
-.sbic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:17px;pointer-events:none;z-index:1}
-.sbar-x{position:absolute;right:9px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;color:var(--tx3);font-size:15px;
-  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;padding:0;transition:all .15s}
-.sbar-x:hover{background:var(--bd);color:var(--tx)}
-
-.tabs{display:flex;border-bottom:2px solid var(--bd);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabi{padding:10px 18px;cursor:pointer;font-size:14px;font-weight:600;
-  color:var(--tx2);border-bottom:2.5px solid transparent;margin-bottom:-2px;
-  transition:all .18s;white-space:nowrap}
-.tabi.on{color:var(--ac);border-bottom-color:var(--ac)}
-
+/* ─── CART ROWS ─────────────────────────────────────────── */
 .crow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
 .crow:last-child{border-bottom:none}
 .qbtn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;
@@ -260,45 +306,79 @@ tr:hover td{background:var(--sf2)}
 .qbtn:hover{border-color:var(--ac);color:var(--ac)}
 .qbtn:active{background:var(--acl)}
 
-.sdot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.sdot.off{background:var(--wn)!important;animation:none}
-
-/* POS grid — desktop: side-by-side panels filling viewport below header
-   The POS header is ~100px tall (approx). On mobile stack vertically. */
-.pos-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;
-  min-height:calc(100vh - 200px)}
+/* ─── POS GRID ──────────────────────────────────────────── */
+.pos-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;height:100%;min-height:0}
 @media(max-width:1000px){.pos-grid{grid-template-columns:1fr 280px}}
-@media(max-width:768px){.pos-grid{display:flex;flex-direction:column;height:auto;gap:14px}}
+@media(max-width:768px){.pos-grid{display:flex;flex-direction:column;height:auto;gap:0}}
 
-.cart-fab{display:none;position:fixed;bottom:72px;right:16px;z-index:150;
-  width:56px;height:56px;border-radius:50%;background:var(--ac);color:#fff;
-  font-size:24px;box-shadow:0 4px 18px rgba(0,0,0,.22);
-  align-items:center;justify-content:center;flex-direction:column;gap:0;border:none;cursor:pointer}
+/* ─── MOBILE CART DRAWER ────────────────────────────────── */
+.cart-fab{
+  display:none;position:fixed;bottom:calc(var(--nav-h) + 10px);right:16px;
+  z-index:1000;
+  width:52px;height:52px;border-radius:50%;background:var(--ac);color:#fff;
+  font-size:22px;box-shadow:0 4px 18px rgba(0,0,0,.22);
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:0;border:none;cursor:pointer}
 .cart-fab:active{transform:scale(.93)}
 @media(max-width:768px){.cart-fab{display:flex}}
-.cart-fab-badge{position:absolute;top:-5px;right:-5px;background:var(--dn);color:#fff;
-  border-radius:50%;min-width:20px;height:20px;font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;border:2px solid var(--sf);padding:0 3px}
-
-.mob-cart-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:180}
+.cart-fab-badge{
+  position:absolute;top:-4px;right:-4px;background:var(--dn);color:#fff;
+  border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;border:2px solid var(--sf);padding:0 2px}
+.mob-cart-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:1800}
 .mob-cart-ov.open{display:block}
-.mob-cart-drawer{position:fixed;bottom:0;left:0;right:0;z-index:190;
-  background:var(--sf);border-radius:22px 22px 0 0;max-height:82vh;
+.mob-cart-drawer{
+  position:fixed;bottom:0;left:0;right:0;z-index:1900;
+  background:var(--sf);border-radius:22px 22px 0 0;max-height:82dvh;
   box-shadow:var(--shlg);padding:0 18px max(18px,env(safe-area-inset-bottom));
   display:flex;flex-direction:column;
   transform:translateY(100%);transition:transform .28s ease}
 .mob-cart-drawer.open{transform:translateY(0)}
 
+/* ─── TOOLTIP ───────────────────────────────────────────── */
 [data-tip]{position:relative}
-[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
+[data-tip]:hover::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
   transform:translateX(-50%);background:var(--tx);color:var(--sf);font-size:11px;font-weight:500;
-  padding:4px 9px;border-radius:6px;white-space:nowrap;z-index:999;pointer-events:none;
+  padding:4px 9px;border-radius:6px;white-space:nowrap;z-index:9999;pointer-events:none;
   font-family:'Poppins',sans-serif;opacity:.95;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-[data-tip]:hover::before{content:"";position:absolute;bottom:calc(100% + 1px);left:50%;
-  transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tx);z-index:999;pointer-events:none}
+[data-tip]:hover::before{
+  content:"";position:absolute;bottom:calc(100% + 1px);left:50%;
+  transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tx);
+  z-index:9999;pointer-events:none}
 
-.login-wrap .fg label{text-align:left}
+/* ─── MOBILE DENSE LAYOUT ───────────────────────────────── */
+/* Mobile-only responsive visibility */
+@media(max-width:768px){
+  #reports-tab{display:block!important}
+  #mob-reports-link{display:block!important}
+  #mob-logout-store{display:block!important}
+}
+/* Edge-to-edge cards, zero side padding on mobile */
+@media(max-width:768px){
+  .pg-body>.card,
+  .pg-body>.cust-card,
+  .pg-body>div>.card{
+    border-radius:0!important;
+    border-left:none!important;
+    border-right:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-shadow:none!important}
+  .pg-body .card{padding:12px 14px!important}
+  .sc{
+    border-radius:0!important;
+    border-left:none!important;border-right:none!important;
+    padding:10px 12px!important;margin:0!important;box-shadow:none!important}
+  .cust-card{border-radius:0!important;border-left:none!important;border-right:none!important}
+  .cust-row{border-radius:0!important}
+  .pg-body [style*="minmax(280px"]{gap:1px!important}
+  .pg-body [style*="minmax(140px"]{gap:2px!important}
+  .pg-body [style*="borderRadius:16"]{
+    border-radius:0!important;
+    border-left:none!important;border-right:none!important;
+    margin-left:0!important;margin-right:0!important;margin-bottom:1px!important}
+}
 `;
   document.head.appendChild(gs);
 }
@@ -584,12 +664,11 @@ export default function App(){
 
   /* ── Login screen ── */
   if(!loggedIn) return(
-    <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100vh",padding:20}}>
+    <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100dvh",padding:20}}>
       <div className="card" style={{width:"100%",maxWidth:380,padding:"36px 28px"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
-          <div style={{margin:"0 auto 14px",width:120,height:120,display:"flex",alignItems:"center",justifyContent:"center"}}>
-          </div>
-          <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>Ligaya's Store</h1>
+          <div style={{width:70,height:70,background:"var(--acl)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:34}}>🏪</div>
+          <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>Ligaya's Sari-Sari Store</h1>
           <p style={{color:"var(--tx2)",fontSize:13,fontWeight:500}}>Store Management System</p>
         </div>
         {loginF.err&&<div style={{background:"var(--dnl)",color:"var(--dn)",borderRadius:"var(--rs)",padding:"9px 14px",marginBottom:14,fontSize:13,fontWeight:500}}>❌ {loginF.err}</div>}
@@ -618,7 +697,7 @@ export default function App(){
 
   /* ── PIN screen ── */
   if(pinShow&&!pinOk) return(
-    <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100vh"}}>
+    <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100dvh"}}>
       <div className="card" style={{padding:"40px 32px",textAlign:"center",width:320,maxWidth:"92vw"}}>
         <div style={{fontSize:34,marginBottom:12}}>🔒</div>
         <h2 style={{fontSize:19,fontWeight:700,marginBottom:6}}>PIN Lock</h2>
@@ -661,8 +740,8 @@ export default function App(){
   /* Mobile bottom nav — Reports is NOT here; it lives inside "More" (Settings) */
   const navItems=[
     {id:"dashboard",icon:"📊",label:"Home"},
-    {id:"pos",icon:"🛒",label:"POS"},
     {id:"inventory",icon:"📦",label:"Items"},
+    // POS is rendered separately as center FAB
     {id:"utang",icon:"📋",label:"Utang"},
     {id:"settings",icon:"⚙️",label:"More"},
   ];
@@ -679,7 +758,7 @@ export default function App(){
   const cp={db,saveData,setConfirm,refresh};
 
   return(
-    <div className="app-root" style={{display:"flex",flexDirection:"column",height:"100vh",overflow:"hidden"}}>
+    <div className="app-root">
       {/* Toast */}
       {toastS&&(
         <div className="toast" style={{borderColor:toastS.type==="err"?"var(--dn)":toastS.type==="warn"?"var(--wn)":"var(--ac)"}}>
@@ -757,8 +836,22 @@ export default function App(){
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="botnav">
-        {navItems.map(item=>(
+      <nav className="botnav" style={{overflow:"visible"}}>
+        {/* Home, Items — left side */}
+        {navItems.slice(0,2).map(item=>(
+          <button key={item.id} className={`ntab ${page===item.id?"on":""}`} onClick={()=>setPage(item.id)}>
+            <span>{item.icon}</span>{item.label}
+          </button>
+        ))}
+        {/* POS — absolute FAB overflowing above the bar */}
+        <div className="ntab-pos-wrap">
+          <button className={`ntab-pos ${page==="pos"?"on":""}`} onClick={()=>setPage("pos")}>
+            <div className="ntab-pos-bubble">🛒</div>
+            <span className="ntab-pos-label">POS</span>
+          </button>
+        </div>
+        {/* Utang, More — right side */}
+        {navItems.slice(2).map(item=>(
           <button key={item.id} className={`ntab ${(page===item.id||(item.id==="settings"&&page==="reports"))?"on":""}`} onClick={()=>setPage(item.id)}>
             <span>{item.icon}</span>{item.label}
           </button>
@@ -1187,8 +1280,8 @@ function POS({db,saveData,setConfirm}){
           </div>
         </div>
 
-        <div className="pg-body" style={{padding:16}}>
-          <div className="pos-grid">
+        <div className="pg-body" style={{display:"flex",flexDirection:"column",padding:16}}>
+          <div className="pos-grid" style={{flex:1,minHeight:0}}>
             <div style={{display:"flex",flexDirection:"column",minHeight:0}}>
               <div style={{overflowY:"auto",flex:1}}>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(115px,1fr))",gap:10}}>
@@ -1552,24 +1645,41 @@ function Utang({db,saveData,setConfirm}){
               <div style={{fontSize:12,color:"var(--tx2)"}}>Current Balance</div>
               <div style={{fontSize:28,fontWeight:700,color:ledgerCust.balance>0?"var(--wn)":"var(--ac)"}}>{fmt(ledgerCust.balance)}</div>
             </div>
-            <div className="twrap">
-              <table>
-                <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr></thead>
-                <tbody>
-                  {ledger.filter(l=>l.customerId===ledgerCust.id).length===0&&(
-                    <tr><td colSpan={4} style={{textAlign:"center",color:"var(--tx3)",padding:24}}>No records</td></tr>
-                  )}
-                  {[...ledger.filter(l=>l.customerId===ledgerCust.id)]
-                    .sort((a,b)=>new Date(b.date)-new Date(a.date)).map(l=>(
-                    <tr key={l.id}>
-                      <td style={{fontSize:12,whiteSpace:"nowrap"}}>{fmtDate(l.date)}<br/><span style={{color:"var(--tx3)"}}>{fmtTime(l.date)}</span></td>
-                      <td><span className={`badge ${l.type==="payment"?"bg-g":"bg-r"}`}>{l.type==="payment"?"Payment":"Utang"}</span></td>
-                      <td style={{fontWeight:700,color:l.type==="payment"?"var(--ac)":"var(--dn)"}}>{l.type==="payment"?"+":"−"}{fmt(l.amount)}</td>
-                      <td style={{fontSize:12,color:"var(--tx2)"}}>{l.description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Vertical ledger list — no horizontal scroll */}
+            <div style={{flex:1,overflowY:"auto",minHeight:0,marginTop:4}}>
+              {ledger.filter(l=>l.customerId===ledgerCust.id).length===0?(
+                <div style={{textAlign:"center",padding:"28px 0",color:"var(--tx3)",fontSize:13}}>No transactions yet</div>
+              ):(
+                [...ledger.filter(l=>l.customerId===ledgerCust.id)]
+                  .sort((a,b)=>new Date(b.date)-new Date(a.date))
+                  .map((l,i,arr)=>(
+                  <div key={l.id} style={{
+                    display:"flex",alignItems:"flex-start",gap:11,
+                    padding:"11px 0",
+                    borderBottom:i<arr.length-1?"1px solid var(--bd)":"none"}}>
+                    {/* Icon bubble */}
+                    <div style={{width:34,height:34,borderRadius:"50%",flexShrink:0,
+                      background:l.type==="payment"?"var(--acl)":"var(--wnl)",
+                      display:"flex",alignItems:"center",justifyContent:"center",fontSize:15}}>
+                      {l.type==="payment"?"💵":"📝"}
+                    </div>
+                    {/* Description + date + badge */}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontWeight:600,fontSize:13,marginBottom:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                        {l.description||"—"}
+                      </div>
+                      <div style={{fontSize:11,color:"var(--tx3)",marginBottom:3}}>
+                        {fmtDate(l.date)} · {fmtTime(l.date)}
+                      </div>
+                    </div>
+                    {/* Amount */}
+                    <div style={{fontWeight:800,fontSize:14,flexShrink:0,paddingTop:3,
+                      color:l.type==="payment"?"var(--ac)":"var(--dn)"}}>
+                      {l.type==="payment"?"+":"−"}{fmt(l.amount)}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -1595,45 +1705,54 @@ function Utang({db,saveData,setConfirm}){
         </div>
 
         {/* Customer list — scrollable */}
-        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:12}}>
+        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:3}}>
           {filteredCustomers.length===0&&(
-            <div className="card" style={{padding:32,textAlign:"center",color:"var(--tx3)"}}>
+            <div className="cust-card" style={{padding:"28px 16px",textAlign:"center",color:"var(--tx3)",fontSize:14}}>
               {search?"No customers match your search.":"No customers yet."}
             </div>
           )}
           {filteredCustomers.map(c=>{
             const isExpanded=expandedId===c.id;
             return(
-            <div key={c.id} className="card" style={{padding:"16px 18px"}}>
-              {/* Header row: avatar + name/contact + status badge — clickable to toggle */}
-              <div style={{display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"}}
-                onClick={()=>setExpandedId(isExpanded?null:c.id)}>
-                <div style={{width:42,height:42,borderRadius:"50%",background:"var(--acl)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:17,color:"var(--ac)",flexShrink:0}}>
+            <div key={c.id} className="cust-card">
+              {/* Compact single row */}
+              <div className="cust-row" onClick={()=>setExpandedId(isExpanded?null:c.id)}>
+                {/* Avatar */}
+                <div style={{width:36,height:36,borderRadius:"50%",flexShrink:0,
+                  background:c.balance>0?"var(--wnl)":"var(--acl)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  fontWeight:800,fontSize:14,
+                  color:c.balance>0?"var(--wn)":"var(--ac)"}}>
                   {c.name.charAt(0).toUpperCase()}
                 </div>
+                {/* Name + contact */}
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontWeight:700,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
-                  <div style={{fontSize:12,color:"var(--tx3)"}}>{c.contact?"Contact: "+c.contact:"—"}</div>
+                  <div style={{fontWeight:700,fontSize:13,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
+                  <div style={{fontSize:11,color:"var(--tx3)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.contact||c.address||"—"}</div>
                 </div>
-                <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
-                  <span className={`badge ${c.balance>0?"bg-r":"bg-g"}`} style={{fontSize:12,padding:"4px 12px"}}>
-                    {c.balance>0?"ACTIVE UTANG":"PAID"}
-                  </span>
-                  <span style={{fontSize:12,color:"var(--tx3)",transition:"transform .2s",display:"inline-block",transform:isExpanded?"rotate(180deg)":"rotate(0deg)"}}>▼</span>
+                {/* Balance + status */}
+                <div style={{textAlign:"right",flexShrink:0,marginRight:6}}>
+                  <div style={{fontWeight:800,fontSize:13,color:c.balance>0?"var(--dn)":"var(--ac)"}}>{fmt(c.balance)}</div>
+                  <span className={`badge ${c.balance>0?"bg-r":"bg-g"}`} style={{fontSize:10,padding:"1px 8px"}}>{c.balance>0?"Utang":"Paid"}</span>
                 </div>
+                {/* Expand chevron */}
+                <span style={{fontSize:11,color:"var(--tx3)",flexShrink:0,
+                  display:"inline-block",transition:"transform .2s",
+                  transform:isExpanded?"rotate(180deg)":"rotate(0deg)"}}>▾</span>
               </div>
-              {/* Balance row — always visible */}
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:10}}>
-                <span style={{fontSize:13,color:"var(--tx2)"}}>Current Balance:</span>
-                <span style={{fontSize:18,fontWeight:800,color:c.balance>0?"var(--dn)":"var(--ac)"}}>{fmt(c.balance)}</span>
-              </div>
-              {/* Action buttons — only shown when expanded */}
+              {/* Action tray — always visible space, never clips */}
               {isExpanded&&(
-                <div style={{display:"grid",gridTemplateColumns:c.balance>0?"1fr 1fr auto auto":"1fr auto auto",gap:8,alignItems:"center",marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)",animation:"shUp .15s ease"}}>
-                  <button className="btn bg2 bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={e=>{e.stopPropagation();setLedgerCust(c);}}>📋 Ledger</button>
-                  {c.balance>0&&<button className="btn bp bsm" style={{minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}} onClick={e=>{e.stopPropagation();setPayModal(c);setPayAmt("");}}>💵 Payment</button>}
-                  <button className="btn bg2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={e=>{e.stopPropagation();setEditCust({...c});setCustModal(true);}}>✏️</button>
-                  <button className="btn bd2 bsm" style={{padding:"7px 12px",flexShrink:0}} onClick={e=>{e.stopPropagation();deleteCust(c);}}>🗑️</button>
+                <div className="cust-actions">
+                  <button className="btn bg2 bsm" style={{flex:1,minWidth:0,fontSize:12,whiteSpace:"nowrap"}}
+                    onClick={e=>{e.stopPropagation();setLedgerCust(c);}}>📋 Ledger</button>
+                  {c.balance>0&&(
+                    <button className="btn bp bsm" style={{flex:1,minWidth:0,fontSize:12,whiteSpace:"nowrap"}}
+                      onClick={e=>{e.stopPropagation();setPayModal(c);setPayAmt("");}}>💵 Pay</button>
+                  )}
+                  <button className="btn bg2 bsm" style={{padding:"6px 13px",fontSize:14,flexShrink:0}}
+                    onClick={e=>{e.stopPropagation();setEditCust({...c});setCustModal(true);}}>✏️</button>
+                  <button className="btn bd2 bsm" style={{padding:"6px 13px",fontSize:14,flexShrink:0}}
+                    onClick={e=>{e.stopPropagation();deleteCust(c);}}>🗑️</button>
                 </div>
               )}
             </div>
@@ -1736,13 +1855,13 @@ function Reports({db}){
     <div className="pg-page">
       {/* Header */}
       <div className="pg-hdr">
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,marginBottom:10}}>
           <h1 style={{fontSize:19,fontWeight:800}}>📈 Reports</h1>
           <button className="btn bp bsm" onClick={doExport} disabled={busy}>
             {busy?"⏳ Exporting…":"📊 Export Excel"}
           </button>
         </div>
-        <div className="tabs" style={{marginBottom:0,borderBottom:"2px solid var(--bd)"}}>
+        <div className="tabs" style={{borderBottom:"none"}}>
           {["daily","weekly","monthly","all"].map(p=>(
             <div key={p} className={`tabi ${period===p?"on":""}`} onClick={()=>setPeriod(p)}>
               {p.charAt(0).toUpperCase()+p.slice(1)}
@@ -1983,26 +2102,16 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
     <div className="pg-page">
       {/* Header */}
       <div className="pg-hdr">
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12,flexWrap:"wrap",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",marginBottom:10}}>
           <h1 style={{fontSize:19,fontWeight:800}}>⚙️ Settings</h1>
-          <button className="btn bp bsm" onClick={saveSettings}>💾 Save</button>
         </div>
-        <div className="tabs" style={{marginBottom:0,borderBottom:"2px solid var(--bd)"}}>
-          {settingsTabs.map(t=>{
-            /* Show Reports tab only on mobile (hidden on desktop — it has sidebar) */
-            if(t.mobileOnly) return(
-              <div key={t.id} className="tabi" style={{display:"none"}}
-                ref={el=>{if(el)el.style.display=window.innerWidth<=768?"block":"none";}}>
-                {t.label}
-              </div>
-            );
-            return(
-              <div key={t.id} className={`tabi ${tab===t.id?"on":""}`} onClick={()=>setTab(t.id)}>
-                {t.label}
-              </div>
-            );
-          })}
-          {/* Reports tab — mobile only, rendered inline */}
+        <div className="tabs" style={{borderBottom:"none"}}>
+          {settingsTabs.filter(t=>!t.mobileOnly).map(t=>(
+            <div key={t.id} className={`tabi ${tab===t.id?"on":""}`} onClick={()=>setTab(t.id)}>
+              {t.label}
+            </div>
+          ))}
+          {/* Reports tab — mobile only */}
           <div className="tabi" id="reports-tab"
             style={{display:"none"}}
             onClick={()=>setPage("reports")}>
@@ -2014,7 +2123,10 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
       <div className="pg-body">
         {tab==="store"&&(
           <div className="card" style={{padding:22}}>
-            <h3 style={{fontWeight:700,marginBottom:16,fontSize:15}}>Store Information</h3>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <h3 style={{fontWeight:700,fontSize:15}}>Store Information</h3>
+              <button className="btn bp bsm" onClick={saveSettings}>💾 Save</button>
+            </div>
             <div className="fg"><label>Store Name</label><input value={form.storeName} onChange={e=>s("storeName",e.target.value)}/></div>
             <div className="fg"><label>Address</label><input value={form.address} onChange={e=>s("address",e.target.value)}/></div>
             <div className="fg"><label>Contact Number</label>
@@ -2110,38 +2222,25 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
         )}
       </div>
 
-      {/* Inject mobile-only elements via a hidden style + inline script approach */}
       <style>{`
         @media(max-width:768px){
           #reports-tab{display:block!important}
           #mob-reports-link{display:block!important}
           #mob-logout-store{display:block!important}
         }
-        /* ── Dense mobile modules: edge-to-edge, zero gap ── */
         @media(max-width:768px){
-          .pg-body{padding:0 0 80px!important}
-          /* All direct-child cards and wrappers: no side margins, no border-radius, thin separators */
+          .pg-body{padding:0 0 70px!important}
           .pg-body>*{margin-left:0!important;margin-right:0!important}
-          .pg-body>.card{border-radius:0!important;border-left:0!important;border-right:0!important;margin-bottom:2px!important}
-          /* Dashboard KPI wrapper */
+          .pg-body>.card,.pg-body>.cust-card{border-radius:0!important;border-left:0!important;border-right:0!important;margin-bottom:0!important}
           .pg-body>[class=""]{padding:0!important}
-          /* Utang customer list gap */
-          .pg-body[style*="gap:12px"]{gap:2px!important}
-          /* Inventory card grid */
-          .pg-body [style*="minmax(280px"]{gap:2px!important;padding:0!important}
-          /* Reports stat grid */
+          .pg-body [style*="minmax(280px"]{gap:1px!important;padding:0!important}
           .pg-body [style*="minmax(140px"]{gap:2px!important}
-          /* Inner card paddings: tighter */
           .pg-body .card{padding:12px 14px!important}
           .pg-body .sc{border-radius:0!important;border-left:0!important;border-right:0!important;margin:0!important}
-          /* Stock alert */
-          .pg-body [style*="borderRadius:16"]{border-radius:0!important;border-left:0!important;border-right:0!important;margin-left:0!important;margin-right:0!important;margin-bottom:2px!important}
-          /* Recent + best-selling grid */
-          .pg-body [style*="minmax(280px,1fr)"]{gap:2px!important}
-          /* Utang pg-body flex col gap */
-          .pg-body[style*="flex-direction:column"]{gap:2px!important;padding:0 0 80px!important}
-          /* POS body */
-          .pg-body[style*="padding:16px"]{padding:4px 0 80px!important}
+          .pg-body [style*="borderRadius:16"]{border-radius:0!important;border-left:0!important;border-right:0!important;margin-left:0!important;margin-right:0!important;margin-bottom:1px!important}
+          .pg-body [style*="minmax(280px,1fr)"]{gap:1px!important}
+          .cust-card{border-radius:0!important;border-left:0!important;border-right:0!important}
+          .cust-row{border-radius:0!important}
         }
       `}</style>
     </div>
