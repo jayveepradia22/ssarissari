@@ -90,7 +90,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   overflow-y:auto;height:100%;z-index:50}
 @media(max-width:768px){.sidebar{display:none}}
 
-.pbody{flex:1;overflow:hidden;min-width:0;height:100%;display:flex;flex-direction:column}
+.pbody{flex:1;overflow:hidden;min-width:0;height:100%;display:flex;flex-direction:column;padding-bottom: 4px;}
 
 .pg-page{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden;background:var(--bg)}
 
@@ -110,7 +110,7 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
   padding:10px 2px;
   background:var(--bg)}
 @media(max-width:768px){
-  .pg-body{padding:0;padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}}
+  .pg-body{padding:0 !important;padding-bottom: 60px !important; + env(safe-area-inset-bottom,0px))}}
 
 /* ─── TOPBAR (mobile) ───────────────────────────────────── */
 .topbar{
@@ -316,6 +316,7 @@ tr:hover td{background:var(--sf2)}
   /* On mobile: single column — cart panel hidden (FAB+drawer handles it) */
   .pos-grid{display:block;height:auto}
   .pos-cart-col{display:none!important}
+  padding-bottom: 80px;
 }
 
 /* ─── MOBILE CART DRAWER ────────────────────────────────── */
@@ -1170,7 +1171,7 @@ function POS({db,saveData,setConfirm}){
         <h3 style={{fontWeight:700,fontSize:15}}>Cart ({cart.length})</h3>
         {cart.length>0&&<button className="btn bd2 bsm" onClick={()=>{setCart([]);setCash("");try{localStorage.removeItem("sari_pos_cart");localStorage.removeItem("sari_pos_cash");}catch{}}}>Clear</button>}
       </div>
-      <div style={{flex:1,overflowY:"auto",minHeight:60}}>
+      <div style={{flex:1,overflowY:"auto",minHeight:60,}}>
         {cart.length===0
           ?<div style={{textAlign:"center",color:"var(--tx3)",padding:"32px 0",fontSize:13}}>Tap a product to add it.</div>
           :cart.map(item=>(
@@ -2250,4 +2251,4 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
 
     </div>
   );
-}
+} 
