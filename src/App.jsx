@@ -101,7 +101,7 @@ input[type=checkbox]{
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  padding:20px 24px 0;
+  padding:4px 0px 0;
   background:var(--bg)}
 @media(max-width:768px){
   .pg-body{padding:0}}
@@ -941,14 +941,14 @@ function Dashboard({db,setPage}){
       {/* Scrollable body */}
       <div className="pg-body">
         {/* KPI Cards 2x2 grid */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20,marginTop:8,padding:"0 0"}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16,marginTop:10,padding:"0 0"}}>
           {[
             {label:"Today's Sales",  value:fmt(daySales),    icon:"💵", color:"var(--ac)",   bg:"rgba(82,183,136,0.08)",  border:"rgba(82,183,136,0.25)"},
             {label:"Transactions",   value:todayTx.length,   icon:"🧾", color:"var(--in)",   bg:"rgba(86,173,245,0.08)",  border:"rgba(86,173,245,0.25)"},
             {label:"Total Products", value:prods.length,     icon:"📦", color:"#b07ef8",     bg:"rgba(176,126,248,0.08)", border:"rgba(176,126,248,0.25)"},
             {label:"Total Utang",    value:fmt(totalUtang),  icon:"📋", color:"var(--wn)",   bg:"rgba(240,165,0,0.08)",   border:"rgba(240,165,0,0.25)"},
           ].map((s,i)=>(
-            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:16,padding:"16px 15px",display:"flex",flexDirection:"column",gap:4}}>
+            <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:10,padding:"16px 16px",display:"flex",flexDirection:"column",gap:3}}>
               <div style={{fontSize:24}}>{s.icon}</div>
               <div style={{fontSize:20,fontWeight:800,lineHeight:1,color:s.color,marginTop:2}}>{s.value}</div>
               <div style={{fontSize:11,color:"var(--tx2)",fontWeight:500}}>{s.label}</div>
@@ -958,17 +958,17 @@ function Dashboard({db,setPage}){
 
         {/* Stock Alert — two-column grid */}
         {allAlerts.length>0&&(
-          <div style={{background:"var(--sf)",border:"1.5px solid var(--bd)",borderRadius:16,padding:"16px 18px",marginBottom:20}}>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+          <div style={{background:"var(--sf)",border:"1.5px solid var(--bd)",borderRadius:10,padding:"16px 18px",marginBottom:16}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
               <span style={{fontSize:16}}>⚠️</span>
-              <span style={{fontWeight:700,fontSize:14,color:"var(--wn)"}}>Stock Alert</span>
+              <span style={{fontWeight:600,fontSize:14,color:"var(--wn)"}}>Stock Alert</span>
               <span style={{marginLeft:"auto",background:"var(--wnl)",color:"var(--wn)",borderRadius:20,padding:"2px 10px",fontSize:12,fontWeight:700}}>{allAlerts.length} items</span>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:8}}>
               {allAlerts.map(p=>{
                 const isOut=p.stock<=0;
                 return(
-                  <div key={p.id} style={{display:"flex",alignItems:"center",gap:8,background:"var(--sf2)",borderRadius:10,padding:"8px 10px",minWidth:0}}>
+                  <div key={p.id} style={{display:"flex",alignItems:"center",gap:6,background:"var(--sf2)",borderRadius:10,padding:"8px 10px",minWidth:0}}>
                     <span style={{fontSize:18,flexShrink:0}}>{CAT_EMOJI(p.category)}</span>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:11,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",color:"var(--tx)"}}>{p.name}</div>
@@ -987,25 +987,25 @@ function Dashboard({db,setPage}){
 
         <div className="dash-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:16}}>
           <div className="card" style={{padding:18}}>
-            <h3 style={{fontSize:14,fontWeight:600,marginBottom:14}}>Recent Transactions</h3>
+            <h3 style={{fontSize:14,fontWeight:600,marginBottom:10}}>Recent Transactions</h3>
             {recent.length===0?<p style={{color:"var(--tx3)",fontSize:13}}>No transactions yet.</p>:recent.map(t=>(
-              <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid var(--bd)"}}>
+              <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",borderBottom:"1px solid var(--bd)"}}>
                 <div>
                   <div style={{fontSize:13,fontWeight:600}}>{t.items?.length||0} item{t.items?.length!==1?"s":""}{t.isUtang?" · Utang":""}</div>
-                  <div style={{fontSize:11,color:"var(--tx3)"}}>{fmtDate(t.date)} {fmtTime(t.date)}</div>
+                  <div style={{fontSize:10,color:"var(--tx3)"}}>{fmtDate(t.date)} {fmtTime(t.date)}</div>
                 </div>
                 <span style={{fontWeight:700,color:t.isUtang?"var(--wn)":"var(--ac)",fontSize:14}}>{fmt(t.total)}</span>
               </div>
             ))}
           </div>
           <div className="card" style={{padding:18}}>
-            <h3 style={{fontSize:14,fontWeight:600,marginBottom:14}}>Best Selling Products</h3>
+            <h3 style={{fontSize:14,fontWeight:600,marginBottom:10}}>Best Selling Products</h3>
             {best.length===0?<p style={{color:"var(--tx3)",fontSize:13}}>No sales yet.</p>:best.map((p,i)=>(
-              <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"5px 0",borderBottom:"1px solid var(--bd)"}}>
+              <div key={p.id} style={{display:"flex",alignItems:"center",gap:10,padding:"4px 0",borderBottom:"1px solid var(--bd)"}}>
                 <div style={{width:24,height:24,borderRadius:"50%",background:"var(--acl)",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:12,color:"var(--ac)",flexShrink:0}}>{i+1}</div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
-                  <div style={{fontSize:11,color:"var(--tx3)"}}>{p.soldQty} sold</div>
+                  <div style={{fontSize:10,color:"var(--tx3)"}}>{p.soldQty} sold</div>
                 </div>
                 <span style={{fontSize:13,fontWeight:700}}>{p.isOpenPrice?"Var.":fmt(p.price)}</span>
               </div>
