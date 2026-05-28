@@ -237,7 +237,7 @@ input[type=checkbox]{
 
 /* ─── SEARCH BAR ────────────────────────────────────────── */
 .sbar{position:relative}
-.sbar input{padding:10px 36px 10px 38px;font-size:14px;min-height:44px}
+.sbar input{padding:10px 36px 10px 38px;font-size:14px;min-height:10px}
 .sbic{
   position:absolute;left:13px;top:50%;transform:translateY(-50%);
   color:var(--tx3);font-size:16px;pointer-events:none;z-index:1}
@@ -413,7 +413,7 @@ tr:hover td{background:var(--sf2)}
     border-radius:0!important;
     border-left:none!important;border-right:none!important}
   .cust-row{border-radius:0!important}
-  .pg-body [style*="minmax(280px"]{gap:8px!important}
+  .pg-body [style*="minmax(280px"]{gap:1px!important}
   .dash-grid{gap:12px!important}
   .rpt-stats{gap:8px!important;padding:0 16px!important}
   .pg-body [style*="minmax(140px"]{gap:2px!important}
@@ -1021,8 +1021,18 @@ function Dashboard({db,setPage}){
 /* ═══════════════════════════════════════════
    CUSTOMER SELECTOR MODAL (used in POS checkout for Utang)
 ═══════════════════════════════════════════ */
-function CustomerSelectorModal({customers,value,onChange,onClose}){
+function CustomerSelectorModal({customers,value,onChange,onClose,onAddNew}){
   const [q,setQ]=useState("");
+  const [adding,setAdding]=useState(false);
+  const [newName,setNewName]=useState("");
+  const [newPhone,setNewPhone]=useState("");
+  const handleAdd=()=>{
+    const name=newName.trim();
+    if(!name){toast("Customer name is required.","err");return;}
+    onAddNew(name,newPhone.trim());
+    setAdding(false);setNewName("");setNewPhone("");
+    onClose();
+  };
   const sorted=useMemo(()=>[...customers].sort((a,b)=>a.name.localeCompare(b.name)),[customers]);
   const filtered=useMemo(()=>sorted.filter(c=>
     c.name.toLowerCase().includes(q.toLowerCase())||
@@ -1031,52 +1041,76 @@ function CustomerSelectorModal({customers,value,onChange,onClose}){
 
   return(
     <div className="backdrop" style={{alignItems:"center",padding:16}} onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{background:"var(--sf)",width:"100%",maxWidth:480,borderRadius:18,
+      <div style={{background:"var(--sf)",width:"100%",maxWidth:480,borderRadius:10,
         maxHeight:"82vh",display:"flex",flexDirection:"column",boxShadow:"var(--shlg)",
         animation:"shUp .22s ease",overflow:"hidden"}}>
         {/* Header */}
-        <div style={{padding:"18px 20px 12px",flexShrink:0,borderBottom:"1.5px solid var(--bd)"}}>
+        <div style={{padding:"18px 20px 10px",flexShrink:0,borderBottom:"1.5px solid var(--bd)"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
             <h3 style={{fontWeight:700,fontSize:16}}>👤 Select Customer</h3>
             <button className="btn bg2 bsm" onClick={onClose}>✕</button>
           </div>
-          <div className="sbar">
-            <span className="sbic">🔍</span>
-            <input autoFocus placeholder="Search by name or number…" value={q}
-              onChange={e=>setQ(e.target.value)} style={{paddingLeft:40}}/>
-            {q&&<button className="sbar-x" onClick={()=>setQ("")}>✕</button>}
-          </div>
+          {!adding?(
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <div className="sbar" style={{flex:1}}>
+                <span className="sbic">🔍</span>
+                <input autoFocus placeholder="Search by name or number…" value={q}
+                  onChange={e=>setQ(e.target.value)} style={{paddingLeft:40}}/>
+                {q&&<button className="sbar-x" onClick={()=>setQ("")}>✕</button>}
+              </div>
+              <button className="btn bg2 bsm" style={{flexShrink:0}}
+                onClick={()=>{setAdding(true);setQ("");}}>＋ New</button>
+            </div>
+          ):(
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              <div style={{fontWeight:600,fontSize:13,color:"var(--tx2)",marginBottom:2}}>＋ Add New Customer</div>
+              <input autoFocus placeholder="Customer Name *" value={newName}
+                onChange={e=>setNewName(e.target.value)}
+                onKeyDown={e=>e.key==="Enter"&&handleAdd()}/>
+              <input placeholder="Phone Number (optional)" value={newPhone}
+                onChange={e=>setNewPhone(e.target.value.replace(/[^0-9+\-\s]/g,"").slice(0,15))}
+                inputMode="tel"
+                onKeyDown={e=>e.key==="Enter"&&handleAdd()}/>
+              <div style={{display:"flex",gap:8}}>
+                <button className="btn bg2 bsm" style={{flex:1}}
+                  onClick={()=>{setAdding(false);setNewName("");setNewPhone("");}}>Cancel</button>
+                <button className="btn bp bsm" style={{flex:1}} onClick={handleAdd}>✔ Add &amp; Select</button>
+              </div>
+            </div>
+          )}
         </div>
         {/* Customer list */}
-        <div style={{flex:1,overflowY:"auto"}}>
-          {filtered.length===0&&(
-            <div style={{padding:32,textAlign:"center",color:"var(--tx3)",fontSize:14}}>No customers found.</div>
-          )}
-          {filtered.map(c=>(
-            <div key={c.id} onClick={()=>{onChange(c.id);onClose();}}
-              style={{display:"flex",alignItems:"center",gap:14,padding:"12px 20px",
-                cursor:"pointer",borderBottom:"1px solid var(--bd)",transition:"background .12s",
-                background:value===c.id?"var(--acl)":"transparent"}}
-              onMouseEnter={e=>e.currentTarget.style.background=value===c.id?"var(--acl)":"var(--sf2)"}
-              onMouseLeave={e=>e.currentTarget.style.background=value===c.id?"var(--acl)":"transparent"}>
-              <div style={{width:40,height:40,borderRadius:"50%",background:"var(--acl)",
-                display:"flex",alignItems:"center",justifyContent:"center",
-                fontWeight:800,fontSize:16,color:"var(--ac)",flexShrink:0}}>
-                {c.name.charAt(0).toUpperCase()}
+        {!adding&&(
+          <div style={{flex:1,overflowY:"auto"}}>
+            {filtered.length===0&&(
+              <div style={{padding:32,textAlign:"center",color:"var(--tx3)",fontSize:12}}>No customers found.</div>
+            )}
+            {filtered.map(c=>(
+              <div key={c.id} onClick={()=>{onChange(c.id);onClose();}}
+                style={{display:"flex",alignItems:"center",gap:14,padding:"12px 20px",
+                  cursor:"pointer",borderBottom:"1px solid var(--bd)",transition:"background .12s",
+                  background:value===c.id?"var(--acl)":"transparent"}}
+                onMouseEnter={e=>e.currentTarget.style.background=value===c.id?"var(--acl)":"var(--sf2)"}
+                onMouseLeave={e=>e.currentTarget.style.background=value===c.id?"var(--acl)":"transparent"}>
+                <div style={{width:40,height:40,borderRadius:"50%",background:"var(--acl)",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  fontWeight:800,fontSize:16,color:"var(--ac)",flexShrink:0}}>
+                  {c.name.charAt(0).toUpperCase()}
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:700,fontSize:14,color:value===c.id?"var(--ac)":"var(--tx)",
+                    overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
+                  {c.contact&&<div style={{fontSize:12,color:"var(--tx3)"}}>{c.contact}</div>}
+                </div>
+                <div style={{textAlign:"right",flexShrink:0}}>
+                  <div style={{fontSize:13,fontWeight:700,color:c.balance>0?"var(--wn)":"var(--ac)"}}>{fmt(c.balance)}</div>
+                  <div style={{fontSize:11,color:"var(--tx3)"}}>balance</div>
+                </div>
+                {value===c.id&&<span style={{color:"var(--ac)",fontSize:18,flexShrink:0}}>✔</span>}
               </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:700,fontSize:14,color:value===c.id?"var(--ac)":"var(--tx)",
-                  overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</div>
-                {c.contact&&<div style={{fontSize:12,color:"var(--tx3)"}}>{c.contact}</div>}
-              </div>
-              <div style={{textAlign:"right",flexShrink:0}}>
-                <div style={{fontSize:13,fontWeight:700,color:c.balance>0?"var(--wn)":"var(--ac)"}}>{fmt(c.balance)}</div>
-                <div style={{fontSize:11,color:"var(--tx3)"}}>balance</div>
-              </div>
-              {value===c.id&&<span style={{color:"var(--ac)",fontSize:18,flexShrink:0}}>✔</span>}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1085,7 +1119,7 @@ function CustomerSelectorModal({customers,value,onChange,onClose}){
 /* ═══════════════════════════════════════════
    CUSTOMER PICKER (trigger button for POS checkout)
 ═══════════════════════════════════════════ */
-function CustomerPicker({customers,value,onChange}){
+function CustomerPicker({customers,value,onChange,onAddNew}){
   const [modalOpen,setModalOpen]=useState(false);
   const selected=customers.find(c=>c.id===value);
 
@@ -1107,7 +1141,7 @@ function CustomerPicker({customers,value,onChange}){
         <span style={{fontSize:12,color:"var(--tx3)",marginLeft:8}}>▼</span>
       </button>
       {value&&selected&&<div style={{fontSize:12,color:"var(--ac)",marginTop:5,fontWeight:500}}>✔ {selected.name} selected</div>}
-      {modalOpen&&<CustomerSelectorModal customers={customers} value={value} onChange={onChange} onClose={()=>setModalOpen(false)}/>}
+      {modalOpen&&<CustomerSelectorModal customers={customers} value={value} onChange={onChange} onClose={()=>setModalOpen(false)} onAddNew={onAddNew}/>}
     </div>
   );
 }
@@ -1285,7 +1319,15 @@ function POS({db,saveData,setConfirm}){
                 )}
               </div>
             ):(
-              <CustomerPicker customers={db.customers||[]} value={custId} onChange={setCustId}/>
+              <CustomerPicker customers={db.customers||[]} value={custId} onChange={setCustId}
+                onAddNew={async(name,contact)=>{
+                  const newCust={id:uid(),name:sanitize(name),contact:sanitize(contact),address:"",balance:0,createdAt:new Date().toISOString()};
+                  const d=getLS();
+                  d.customers=[newCust,...(d.customers||[])];
+                  await saveData(d);
+                  setCustId(newCust.id);
+                  toast(`${name} added! ✅`);
+                }}/>
             )}
             <button className="btn bp blg" style={{width:"100%",marginTop:8}} onClick={checkout}>✅ Confirm Sale</button>
           </div>
