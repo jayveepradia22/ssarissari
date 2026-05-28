@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 
 /* ── FONT ── */
 {
@@ -134,7 +136,7 @@ input[type=checkbox]{
 
 .ntab{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 4px;font-size:10px;font-weight:500;
+  padding:8px 4px;font-size:10px;font-weight:500;
   color:var(--tx3);background:none;border:none;border-radius:0;
   transition:color .18s}
 .ntab.on{color:var(--ac)}
@@ -145,7 +147,7 @@ input[type=checkbox]{
   flex:1;position:relative;
   display:flex;flex-direction:column;
   align-items:center;justify-content:flex-end;
-  padding-bottom:26px;overflow:visible}
+  padding-bottom:30px;overflow:visible}
 .ntab-pos{
   position:absolute;top:-25px;left:50%;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:3px;
@@ -237,10 +239,10 @@ input[type=checkbox]{
 
 /* ─── SEARCH BAR ────────────────────────────────────────── */
 .sbar{position:relative}
-.sbar input{padding:10px 36px 10px 38px;font-size:14px;min-height:10px}
+.sbar input{padding:7px 32px 7px 34px;font-size:13px;min-height:10px}
 .sbic{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  color:var(--tx3);font-size:16px;pointer-events:none;z-index:1}
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  color:var(--tx3);font-size:14px;pointer-events:none;z-index:1}
 .sbar-x{
   position:absolute;right:10px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;color:var(--tx3);
@@ -568,7 +570,7 @@ function SearchBar({value,onChange,placeholder="Search…",style={}}){
   const ref=useRef(null);
   return(
     <div className="sbar" style={{flex:1,...style}}>
-      <span className="sbic">🔍</span>
+      <span className="sbic"><FontAwesomeIcon icon={faMagnifyingGlass} /></span>
       <input ref={ref} placeholder={placeholder} value={value}
         onChange={e=>onChange(e.target.value)}
         onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();ref.current?.blur();}}}
@@ -730,11 +732,11 @@ export default function App(){
               onKeyDown={e=>e.key==="Enter"&&doLogin()} autoComplete="off" maxLength={128}/>
             <button onClick={()=>setLoginF(p=>({...p,showP:!p.showP}))}
               style={{position:"absolute",right:10,top:32,background:"none",border:"none",cursor:"pointer",color:"var(--tx3)",fontSize:16,padding:4}}>
-              {loginF.showP?"🙈":"👁"}
+              {loginF.showP?<FontAwesomeIcon icon={faEye} />:<FontAwesomeIcon icon={faEyeSlash} />}
             </button>
           </div>
         </div>
-        <button className="btn bp blg" style={{width:"100%"}} onClick={doLogin}>🔐 Login</button>
+        <button className="btn bp blg" style={{width:"100%"}} onClick={doLogin}><FontAwesomeIcon icon={faLock} /> Login</button>
       </div>
     </div>
   );
@@ -743,7 +745,7 @@ export default function App(){
   if(pinShow&&!pinOk) return(
     <div className="app-root" style={{alignItems:"center",justifyContent:"center",display:"flex",minHeight:"100dvh"}}>
       <div className="card" style={{padding:"40px 32px",textAlign:"center",width:320,maxWidth:"92vw"}}>
-        <div style={{fontSize:34,marginBottom:12}}>🔒</div>
+        <div style={{fontSize:34,marginBottom:12}}><FontAwesomeIcon icon={faLock} /></div>
         <h2 style={{fontSize:19,fontWeight:700,marginBottom:6}}>PIN Lock</h2>
         <p style={{fontSize:13,color:"var(--tx2)",marginBottom:28}}>Enter your 4-digit PIN to continue</p>
         <div style={{display:"flex",justifyContent:"center",gap:10,marginBottom:32}}>
@@ -762,7 +764,7 @@ export default function App(){
     </div>
   );
 
-  const logout=()=>setConfirm({title:"Log Out",msg:"Are you sure you want to log out?",icon:"🚪",danger:true,confirmText:"Log Out",
+  const logout=()=>setConfirm({title:"Log Out",msg:"Are you sure you want to log out?",icon:<FontAwesomeIcon icon={faRightFromBracket} />,danger:true,confirmText:"Log Out",
     onConfirm:()=>{
       sessionStorage.removeItem("sari_auth");
       sessionStorage.clear();
@@ -779,20 +781,19 @@ export default function App(){
 
   /* Mobile bottom nav — Reports is NOT here; it lives inside "More" (Settings) */
   const navItems=[
-    {id:"dashboard",icon:"📊",label:"Home"},
-    {id:"inventory",icon:"📦",label:"Items"},
-    // POS is rendered separately as center FAB
-    {id:"utang",icon:"📋",label:"Utang"},
-    {id:"settings",icon:"⚙️",label:"More"},
+    {id:"dashboard", icon:<FontAwesomeIcon icon={faHouse} />, label:"Home"},
+    {id: "inventory", icon: <FontAwesomeIcon icon={faBoxesStacked} />, label: "Items"},
+    {id:"utang",icon:<FontAwesomeIcon icon={faClipboardList} />,label:"Utang"},
+    {id:"settings",icon:<FontAwesomeIcon icon={faGear} />,label:"More"},
   ];
   /* Desktop sidebar — Reports visible here */
   const sideItems=[
-    {id:"dashboard",icon:"📊",label:"Dashboard"},
-    {id:"pos",icon:"🛒",label:"Point of Sale"},
-    {id:"inventory",icon:"📦",label:"Inventory"},
-    {id:"utang",icon:"📋",label:"Utang"},
-    {id:"reports",icon:"📈",label:"Reports"},
-    {id:"settings",icon:"⚙️",label:"Settings"},
+    {id:"dashboard",icon:<FontAwesomeIcon icon={faHouse} />,label:"Dashboard"},
+    {id:"pos",icon:<FontAwesomeIcon icon={faCartShopping} />,label:"Point of Sale"},
+    {id:"inventory",icon:<FontAwesomeIcon icon={faBoxesStacked} />,label:"Inventory"},
+    {id:"utang",icon:<FontAwesomeIcon icon={faClipboardList} />,label:"Utang"},
+    {id:"reports",icon:<FontAwesomeIcon icon={faChartLine} />,label:"Reports"},
+    {id:"settings",icon:<FontAwesomeIcon icon={faGear} />,label:"Settings"},
   ];
 
   const cp={db,saveData,setConfirm,refresh};
@@ -860,7 +861,7 @@ export default function App(){
               <span style={{fontSize:12,color:"var(--tx2)"}}>{dark?"🌙 Dark":"☀️ Light"}</span>
               <button className="btn bg2 bsm" style={{padding:"5px 10px"}} onClick={toggleDark}>{dark?"☀️":"🌙"}</button>
             </div>
-            <button className="btn bg2 bsm" style={{width:"100%"}} onClick={logout}>🚪 Log Out</button>
+            <button className="btn bg2 bsm" style={{width:"100%"}} onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} /> Log Out</button>
           </div>
         </aside>
 
@@ -934,7 +935,7 @@ function Dashboard({db,setPage}){
               {new Date().toLocaleDateString("en-PH",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
             </p>
           </div>
-          <button className="btn bp bsm" onClick={()=>setPage("pos")}>🛒 New Sale</button>
+          <button className="btn bp bsm" onClick={()=>setPage("pos")}><FontAwesomeIcon icon={faCartShopping} /> New Sale</button>
         </div>
       </div>
 
@@ -1337,7 +1338,7 @@ function POS({db,saveData,setConfirm}){
       {receiptData&&<ReceiptModal data={receiptData} onClose={()=>setReceiptData(null)}/>}
 
       <button className="cart-fab" onClick={()=>setMobCartOpen(true)}>
-        🛒
+        <FontAwesomeIcon icon={faCartShopping} />
         {cart.length>0&&<div className="cart-fab-badge">{cart.reduce((s,i)=>s+i.qty,0)}</div>}
       </button>
 
@@ -1414,7 +1415,7 @@ function ReceiptModal({data,onClose}){
               <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span>Cash</span><span>{fmt(txn.cash)}</span></div>
               <div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span>Change</span><span>{fmt(txn.change)}</span></div>
             </>}
-            {txn.isUtang&&<div style={{color:"var(--wn)",fontWeight:700,fontSize:13,marginTop:4}}>⚠️ On Credit / Utang</div>}
+            {txn.isUtang&&<div style={{color:"var(--wn)",fontWeight:700,fontSize:13,marginTop:4}}><FontAwesomeIcon icon={faTriangleExclamation} /> On Credit / Utang</div>}
           </div>
           <div style={{textAlign:"center",marginTop:14,fontSize:13,borderTop:"1px dashed var(--bd)",paddingTop:10}}>
             Thank you! Please come again 🫶
@@ -1422,7 +1423,7 @@ function ReceiptModal({data,onClose}){
         </div>
         <div style={{display:"flex",gap:10,marginTop:20}}>
           <button className="btn bg2" style={{flex:1}} onClick={onClose}>Close</button>
-          <button className="btn bp" style={{flex:1}} onClick={()=>window.print()}>🖨️ Print</button>
+          <button className="btn bp" style={{flex:1}} onClick={()=>window.print()}><FontAwesomeIcon icon={faPrint} /> Print</button>
         </div>
       </div>
     </div>
@@ -1464,7 +1465,7 @@ function Inventory({db,saveData,setConfirm}){
 
   const handleDelete=p=>setConfirm({
     title:"Delete Product",msg:`Delete "${p.name}"?\nThis cannot be undone.`,
-    icon:"🗑️",danger:true,confirmText:"Delete",
+    icon:<FontAwesomeIcon icon={faTrashCan} />,danger:true,confirmText:"Delete",
     onConfirm:async()=>{
       const d=getLS();d.products=(d.products||[]).filter(x=>x.id!==p.id);
       await saveData(d);toast("Product deleted.");
@@ -1547,11 +1548,11 @@ function InventoryCard({p,stockColor,stockBg,stockLabel,onEdit,onDelete}){
             <button style={{display:"flex",alignItems:"center",gap:9,padding:"11px 16px",width:"100%",fontSize:13,fontWeight:600,color:"var(--tx)",background:"none",border:"none",cursor:"pointer",transition:"background .15s"}}
               onMouseEnter={e=>e.currentTarget.style.background="var(--sf2)"}
               onMouseLeave={e=>e.currentTarget.style.background="none"}
-              onClick={()=>{setMenuOpen(false);onEdit();}}>✏️ Edit</button>
+              onClick={()=>{setMenuOpen(false);onEdit();}}> <FontAwesomeIcon icon={faPen} /> Edit</button>
             <button style={{display:"flex",alignItems:"center",gap:9,padding:"11px 16px",width:"100%",fontSize:13,fontWeight:600,color:"var(--dn)",background:"none",border:"none",cursor:"pointer",borderTop:"1px solid var(--bd)",transition:"background .15s"}}
               onMouseEnter={e=>e.currentTarget.style.background="var(--dnl)"}
               onMouseLeave={e=>e.currentTarget.style.background="none"}
-              onClick={()=>{setMenuOpen(false);onDelete();}}>🗑️ Delete</button>
+              onClick={()=>{setMenuOpen(false);onDelete();}}> <FontAwesomeIcon icon={faTrashCan} /> Delete</button>
           </div>
         )}
       </div>
@@ -1567,7 +1568,8 @@ function ProdModal({product,onSave,onClose}){
     <div className="backdrop">
       <div className="msheet mlg">
         <div className="shandle"/>
-        <h3 style={{fontWeight:700,marginBottom:20,fontSize:16}}>{isNew?"➕ Add Product":"✏️ Edit Product"}</h3>
+        <h3 style={{ fontWeight: 700, marginBottom: 20, fontSize: 16 }}>{isNew ? ("➕ Add Product") : (<><FontAwesomeIcon icon={faPen} /> Edit Product</>)}
+        </h3>
         <div className="fg"><label>Product Name *</label>
           <input placeholder="e.g. Lucky Me Pancit Canton" value={form.name}
             onChange={e=>s("name",e.target.value)} autoFocus maxLength={200}/>
@@ -1595,7 +1597,7 @@ function ProdModal({product,onSave,onClose}){
         <div style={{display:"flex",gap:10,marginTop:6}}>
           <button className="btn bg2" style={{flex:1}} onClick={onClose}>✕ Cancel</button>
           <button className="btn bp" style={{flex:2}} onClick={()=>onSave(form,isNew)}>
-            💾 {isNew?"Add Product":"Save Changes"}
+            <FontAwesomeIcon icon={faFloppyDisk} /> {isNew?"Add Product":"Save Changes"}
           </button>
         </div>
       </div>
@@ -1656,21 +1658,18 @@ function Utang({db,saveData,setConfirm}){
       setConfirm({
         title:"Confirm Payment",
         msg:`Record ${fmt(amtSnap)} payment from ${snap.name}?\nRemaining: ${fmt(Math.max(0,snap.balance-amtSnap))}`,
-        icon:"💵",confirmText:"Confirm",
+        icon:<FontAwesomeIcon icon={faHandHoldingDollar} />,confirmText:"Confirm",
         onConfirm:async()=>{
           const d=getLS();
           const ci=d.customers.findIndex(c=>c.id===snap.id);
           if(ci>=0)d.customers[ci].balance=parseFloat(Math.max(0,d.customers[ci].balance-amtSnap).toFixed(2));
           d.utangLedger=[{id:uid(),customerId:snap.id,type:"payment",amount:amtSnap,
             description:"Partial payment",date:new Date().toISOString()},...(d.utangLedger||[])];
-          await saveData(d);toast("Payment recorded! 💵");okBeep();
-        }
-      });
-    },60);
-  };
+          await saveData(d);toast(<span>Payment recorded! <FontAwesomeIcon icon={faHandHoldingDollar} /></span>);;okBeep();
+          }});},60);};
 
   const deleteCust=c=>setConfirm({
-    title:"Delete Customer",msg:`Delete "${c.name}"?\nAll records will be removed.`,icon:"🗑️",danger:true,confirmText:"Delete",
+    title:"Delete Customer",msg:`Delete "${c.name}"?\nAll records will be removed.`,icon:<FontAwesomeIcon icon={faTrashCan} />,danger:true,confirmText:"Delete",
     onConfirm:async()=>{
       const d=getLS();
       d.customers=(d.customers||[]).filter(x=>x.id!==c.id);
@@ -1685,7 +1684,7 @@ function Utang({db,saveData,setConfirm}){
         <div className="backdrop">
           <div className="msheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
             <div className="shandle"/>
-            <h3 style={{fontWeight:700,marginBottom:18,fontSize:16}}>{editCust?"✏️ Edit Customer":"➕ Add Customer"}</h3>
+            <h3 style={{ fontWeight:700, marginBottom:18, fontSize:16 }}>{editCust ? (<><FontAwesomeIcon icon={faPen} /> Edit Customer</>) : ("➕ Add Customer")}</h3>
             <CustForm init={editCust||{}} onSave={handleSaveCust} onClose={()=>{setCustModal(false);setEditCust(null);}}/>
           </div>
         </div>
@@ -1695,7 +1694,7 @@ function Utang({db,saveData,setConfirm}){
         <div className="backdrop">
           <div className="msheet" style={{maxWidth:360,alignSelf:"center",borderRadius:"var(--r)"}}>
             <div className="shandle"/>
-            <h3 style={{fontWeight:700,marginBottom:6,fontSize:16}}>💵 Payment</h3>
+            <h3 style={{fontWeight:700,marginBottom:6,fontSize:16}}><FontAwesomeIcon icon={faHandHoldingDollar} /> Payment</h3>
             <p style={{color:"var(--tx2)",fontSize:13,marginBottom:6}}>{payModal.name}</p>
             <div style={{background:"var(--wnl)",border:"1.5px solid var(--wn)",borderRadius:"var(--rs)",padding:12,marginBottom:16}}>
               <span style={{color:"var(--wn)",fontWeight:600}}>Balance: {fmt(payModal.balance)}</span>
@@ -1729,7 +1728,7 @@ function Utang({db,saveData,setConfirm}){
         <div className="backdrop">
           <div className="msheet mlg" style={{alignSelf:"center",borderRadius:"var(--r)"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-              <h3 style={{fontWeight:700,fontSize:16}}>📋 {ledgerCust.name}'s Ledger</h3>
+              <h3 style={{fontWeight:700,fontSize:16}}><FontAwesomeIcon icon={faClipboardList} /> {ledgerCust.name}'s Ledger</h3>
               <button className="btn bg2 bsm" onClick={()=>setLedgerCust(null)}>✕</button>
             </div>
             <div style={{background:ledgerCust.balance>0?"var(--wnl)":"var(--acl)",border:`1.5px solid ${ledgerCust.balance>0?"var(--wn)":"var(--ac)"}`,borderRadius:"var(--rs)",padding:14,marginBottom:16,textAlign:"center"}}>
@@ -1752,7 +1751,7 @@ function Utang({db,saveData,setConfirm}){
                     <div style={{width:34,height:34,borderRadius:"50%",flexShrink:0,
                       background:l.type==="payment"?"var(--acl)":"var(--wnl)",
                       display:"flex",alignItems:"center",justifyContent:"center",fontSize:15}}>
-                      {l.type==="payment"?"💵":"📝"}
+                      {l.type==="payment"?<FontAwesomeIcon icon={faHandHoldingDollar} />:<FontAwesomeIcon icon={faFilePen} />}
                     </div>
                     {/* Description + date + badge */}
                     <div style={{flex:1,minWidth:0}}>
@@ -1835,15 +1834,15 @@ function Utang({db,saveData,setConfirm}){
               {isExpanded&&(
                 <div className="cust-actions">
                   <button className="btn bg2 bsm" style={{flex:1,minWidth:0,fontSize:12,whiteSpace:"nowrap"}}
-                    onClick={e=>{e.stopPropagation();setLedgerCust(c);}}>📋 Ledger</button>
+                    onClick={e=>{e.stopPropagation();setLedgerCust(c);}}><FontAwesomeIcon icon={faClipboardList} /> Ledger</button>
                   {c.balance>0&&(
                     <button className="btn bp bsm" style={{flex:1,minWidth:0,fontSize:12,whiteSpace:"nowrap"}}
-                      onClick={e=>{e.stopPropagation();setPayModal(c);setPayAmt("");}}>💵 Pay</button>
+                      onClick={e=>{e.stopPropagation();setPayModal(c);setPayAmt("");}}><FontAwesomeIcon icon={faHandHoldingDollar} /> Pay</button>
                   )}
                   <button className="btn bg2 bsm" style={{padding:"6px 13px",fontSize:14,flexShrink:0}}
-                    onClick={e=>{e.stopPropagation();setEditCust({...c});setCustModal(true);}}>✏️</button>
+                    onClick={e=>{e.stopPropagation();setEditCust({...c});setCustModal(true);}}><FontAwesomeIcon icon={faPen} /></button>
                   <button className="btn bd2 bsm" style={{padding:"6px 13px",fontSize:14,flexShrink:0}}
-                    onClick={e=>{e.stopPropagation();deleteCust(c);}}>🗑️</button>
+                    onClick={e=>{e.stopPropagation();deleteCust(c);}}><FontAwesomeIcon icon={faTrashCan} /></button>
                 </div>
               )}
             </div>
@@ -2218,7 +2217,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
           <div className="card" style={{padding:22}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <h3 style={{fontWeight:700,fontSize:15}}>Store Information</h3>
-              <button className="btn bp bsm" onClick={saveSettings}>💾 Save</button>
+              <button className="btn bp bsm" onClick={saveSettings}><FontAwesomeIcon icon={faFloppyDisk} /> Save</button>
             </div>
             <div className="fg"><label>Store Name</label><input value={form.storeName} onChange={e=>s("storeName",e.target.value)}/></div>
             <div className="fg"><label>Address</label><input value={form.address} onChange={e=>s("address",e.target.value)}/></div>
@@ -2237,7 +2236,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
             {/* Reports shortcut — mobile only, inside Store tab */}
             <div id="mob-reports-link" style={{display:"none",padding:"14px 0",borderTop:"1px solid var(--bd)"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <div><div style={{fontWeight:600,fontSize:14}}>📈 Reports</div><div style={{fontSize:12,color:"var(--tx2)"}}>View sales reports</div></div>
+                <div><div style={{fontWeight:600,fontSize:14}}><FontAwesomeIcon icon={faChartLine} /> Reports</div><div style={{fontSize:12,color:"var(--tx2)"}}>View sales reports</div></div>
                 <button className="btn bg2 bsm" onClick={()=>setPage("reports")}>Open →</button>
               </div>
             </div>
@@ -2245,7 +2244,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
             <div id="mob-logout-store" style={{display:"none",padding:"14px 0",borderTop:"1px solid var(--bd)"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <div><div style={{fontWeight:600,fontSize:14}}>Log Out</div><div style={{fontSize:12,color:"var(--tx2)"}}>Sign out from this device</div></div>
-                <button className="btn bd2 bsm" onClick={logout}>🚪 Log Out</button>
+                <button className="btn bd2 bsm" onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} /> Log Out</button>
               </div>
             </div>
           </div>
@@ -2253,7 +2252,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
 
         {tab==="security"&&(
           <div className="card" style={{padding:22}}>
-            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15}}>🔒 PIN Lock</h3>
+            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15}}><FontAwesomeIcon icon={faLock} /> PIN Lock</h3>
             <p style={{color:"var(--tx2)",fontSize:13,marginBottom:16}}>A 4-digit PIN for daily quick access after login.</p>
             <div style={{display:"flex",gap:10,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
               {db.settings.pinEnabled
@@ -2264,11 +2263,11 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
               <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap"}}>
                 <button className="btn bg2 bsm" onClick={startChangePin}>🔄 Change PIN</button>
                 {/* Disable PIN now requires password */}
-                <button className="btn bd2 bsm" onClick={startDisablePin}>🔓 Disable PIN</button>
+                <button className="btn bd2 bsm" onClick={startDisablePin}><FontAwesomeIcon icon={faLockOpen} />Disable PIN</button>
               </div>
             )}
             {!db.settings.pinEnabled&&pinFlow==="idle"&&(
-              <button className="btn bp bsm" style={{marginBottom:20}} onClick={startChangePin}>🔒 Set PIN</button>
+              <button className="btn bp bsm" style={{marginBottom:20}} onClick={startChangePin}><FontAwesomeIcon icon={faLock} /> Set PIN</button>
             )}
             {pinFlow!=="idle"&&(
               <div style={{background:"var(--sf2)",borderRadius:"var(--rs)",padding:22,textAlign:"center"}}>
@@ -2289,11 +2288,11 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
 
         {tab==="backup"&&(
           <div className="card" style={{padding:22}}>
-            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15}}>💾 Backup & Restore</h3>
+            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15}}><FontAwesomeIcon icon={faFloppyDisk} /> Backup & Restore</h3>
             <p style={{color:"var(--tx2)",fontSize:13,marginBottom:20}}>Export your full data as an Excel file. Import it to restore everything.</p>
             <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
               <button className="btn bp bsm" onClick={exportBackup} disabled={busy}>
-                {busy?"⏳ Exporting…":"📊 Export Backup (Excel)"}
+                {busy ? ("⏳ Exporting…") : (<><FontAwesomeIcon icon={faFileExport} /> Export Backup (Excel)</>)}
               </button>
               <button className="btn bg2 bsm" onClick={importBackup}>⬆️ Import Backup (Excel)</button>
             </div>
@@ -2308,7 +2307,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
 
         {tab==="danger"&&(
           <div className="card" style={{padding:22,border:"1.5px solid var(--dn)"}}>
-            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15,color:"var(--dn)"}}>⚠️ Danger Zone</h3>
+            <h3 style={{fontWeight:700,marginBottom:6,fontSize:15,color:"var(--dn)"}}><FontAwesomeIcon icon={faTriangleExclamation} /> Danger Zone</h3>
             <p style={{color:"var(--tx2)",fontSize:13,marginBottom:20}}>These actions are permanent and cannot be undone.</p>
             <button className="btn bd2" onClick={resetAll}>☠️ Reset ALL Data</button>
           </div>
