@@ -13,30 +13,32 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
   const gs=document.createElement("style");
   gs.textContent=`
 
-/* ─── RESET ────────────────────────────────────────────── */
+/* ─── RESET ─────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-/* ─── SCROLLBAR: globally invisible ───────────────────── */
+/* ─── SCROLLBAR: globally invisible ─────────────────────── */
 ::-webkit-scrollbar{display:none!important}
 *{scrollbar-width:none;-ms-overflow-style:none}
 
-/* ─── ROOT / THEME ─────────────────────────────────────── */
+/* ─── ROOT / THEME ──────────────────────────────────────── */
 html,body{
   height:100dvh;width:100vw;
   font-family:'Poppins',sans-serif;
+  font-size:14px;font-weight:400;line-height:1.5;
   -webkit-tap-highlight-color:transparent;
   overflow:hidden;
-  background:var(--bg)}
+  background:var(--bg);color:var(--tx)}
 
 :root{
-  --bg:#f5f4f0;--sf:#fff;--sf2:#eeece8;--bd:#e2dfd8;
-  --tx:#18160f;--tx2:#6a6358;--tx3:#aca59b;
-  --ac:#2d6a4f;--ac2:#40916c;--acl:#d8f3dc;--acd:#b7e4c7;
-  --dn:#c0392b;--dnl:#fdecea;
-  --wn:#c87800;--wnl:#fff3cd;
-  --in:#1a6db5;--inl:#e3f0fd;
-  --r:14px;--rs:9px;
-  --sh:0 1px 8px rgba(0,0,0,.07);--shlg:0 8px 32px rgba(0,0,0,.13);
+  --bg:#f8f7f5;--sf:#ffffff;--sf2:#f0ede8;--bd:#e5e1da;
+  --tx:#1a1814;--tx2:#6b6358;--tx3:#a89f95;
+  --ac:#2d6a4f;--ac2:#40916c;--acl:#e8f5ee;--acd:#b7e4c7;
+  --dn:#c0392b;--dnl:#fdf2f1;
+  --wn:#b86e00;--wnl:#fdf6e3;
+  --in:#1a6db5;--inl:#edf4fc;
+  --r:12px;--rs:8px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 8px rgba(0,0,0,.04);
+  --shlg:0 8px 32px rgba(0,0,0,.10);
   --nav-h:62px
 }
 .dark{
@@ -46,86 +48,84 @@ html,body{
   --dn:#e05252;--dnl:#2d1212;
   --wn:#f0a500;--wnl:#2a1e00;
   --in:#56adf5;--inl:#0d1e33;
-  --sh:0 1px 8px rgba(0,0,0,.3);--shlg:0 8px 32px rgba(0,0,0,.5)
+  --sh:0 1px 4px rgba(0,0,0,.25);--shlg:0 8px 32px rgba(0,0,0,.5)
 }
 
 /* ─── BASE ELEMENTS ─────────────────────────────────────── */
-input,select,textarea,button{font-family:'Poppins',sans-serif}
+input,select,textarea,button{font-family:'Poppins',sans-serif;font-size:14px}
 button{cursor:pointer;transition:all .18s;border:none;background:none}
 button:active{transform:scale(.97)}
 input,select,textarea{
-  background:var(--sf2);border:1.5px solid var(--bd);border-radius:var(--rs);
-  color:var(--tx);padding:11px 14px;width:100%;font-size:14px;outline:none;
+  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);
+  color:var(--tx);padding:12px 14px;width:100%;font-size:14px;font-weight:400;
+  min-height:44px;outline:none;
   transition:border .18s,box-shadow .18s;-webkit-appearance:none;appearance:none}
-input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--acl)}
-input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointer;flex-shrink:0}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--ac);box-shadow:0 0 0 3px var(--acl)}
+input[type=checkbox]{
+  width:18px;height:18px;accent-color:var(--ac);cursor:pointer;
+  flex-shrink:0;min-height:unset}
 
 /* ─── APP SHELL ─────────────────────────────────────────── */
-/* Single 100dvh column; topbar (mobile) + mwrap fills the rest */
 .app-root{
   font-family:'Poppins',sans-serif;
   background:var(--bg);color:var(--tx);
   display:flex;flex-direction:column;
   width:100vw;height:100dvh;
-  overflow:hidden;
-  position: fixed;
+  overflow:hidden;position:fixed;
   transition:background .25s,color .25s}
 
-/* ─── LAYOUT TREE ───────────────────────────────────────────
-   .app-root  (flex col, 100dvh, overflow:hidden)
-     .topbar   (mobile, flex-shrink:0)
-     .mwrap    (flex:1, min-height:0, overflow:hidden)
-       .sidebar   (desktop, 220px, own scroll, z-index:50)
-       .pbody     (flex:1, overflow:hidden — size anchor only)
-         .pg-page  (flex col, height:100%, overflow:hidden)
-           .pg-hdr  (flex-shrink:0 — pinned, never scrolls)
-           .pg-body (flex:1, overflow-y:auto — ONLY scroll region)
-     .botnav   (fixed, bottom:0, z-index:999, mobile only)
-──────────────────────────────────────────────────────────── */
+/* ─── LAYOUT ────────────────────────────────────────────── */
 .mwrap{display:flex;flex:1;min-height:0;overflow:hidden;width:100%}
 
 .sidebar{
-  width:220px;background:var(--sf);border-right:1.5px solid var(--bd);
-  display:flex;flex-direction:column;padding:16px 10px;flex-shrink:0;
+  width:230px;background:var(--sf);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;padding:20px 12px;flex-shrink:0;
   overflow-y:auto;height:100%;z-index:50}
 @media(max-width:768px){.sidebar{display:none}}
 
-.pbody{flex:1;overflow:hidden;min-width:0;height:100%;display:flex;flex-direction:column;padding-bottom: 4px;}
+/* pbody: pure flex size anchor — no padding, no visual properties */
+.pbody{flex:1;overflow:hidden;min-width:0;height:103dvh;display:flex;flex-direction:column}
 
-.pg-page{display:flex;flex-direction:column;flex:1;min-height:0;height:100%;overflow:hidden;background:var(--bg)}
+.pg-page{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;background:var(--bg)}
 
 .pg-hdr{
   flex-shrink:0;background:var(--sf);
-  padding:12px 16px 12px !important;
-  border-bottom:1.5px solid var(--bd);
-  z-index:10;transition:background .25s;
-  overflow-x:hidden}
-@media(max-width:768px){.pg-hdr{padding:10px 16px 8px}}
+  padding:16px 24px;
+  border-bottom:1px solid var(--bd);
+  z-index:10;transition:background .25s}
+@media(max-width:768px){.pg-hdr{padding:12px 16px}}
 
+/* pg-body: the one scroll container per page */
 .pg-body{
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  padding-bottom: 0px !important;
-  padding:10px 2px;
+  padding:20px 24px 0;
   background:var(--bg)}
 @media(max-width:768px){
-  .pg-body{padding:0 !important;padding-bottom: 60px !important; + env(safe-area-inset-bottom,0px))}}
+  .pg-body{padding:0}}
+
+/* pg-spacer: last child inside every pg-body — real element, not padding,
+   so it does NOT become phantom scrollable blank space */
+.pg-spacer{
+  display:block;width:100%;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
+  flex-shrink:0;pointer-events:none}
 
 /* ─── TOPBAR (mobile) ───────────────────────────────────── */
 .topbar{
   display:none;align-items:center;justify-content:space-between;
-  padding:10px 16px;background:var(--sf);border-bottom:1.5px solid var(--bd);
+  padding:12px 16px;background:var(--sf);border-bottom:1px solid var(--bd);
   z-index:100;gap:8px;flex-shrink:0;width:100%}
 @media(max-width:768px){.topbar{display:flex}}
 
 /* ─── BOTTOM NAV (mobile) ───────────────────────────────── */
-/* z-index:999, fixed, overflow:visible so the FAB can bleed upward */
 .botnav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;
   height:var(--nav-h);
-  background:var(--sf);border-top:1.5px solid var(--bd);
+  background:var(--sf);border-top:1px solid var(--bd);
   z-index:999;
   padding-bottom:env(safe-area-inset-bottom,0px);
   align-items:flex-end;justify-content:space-around;
@@ -134,108 +134,117 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 
 .ntab{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 4px;font-size:10px;font-weight:600;
-  color:var(--tx3);background:none;border:none;border-radius:0}
+  padding:6px 4px;font-size:10px;font-weight:500;
+  color:var(--tx3);background:none;border:none;border-radius:0;
+  transition:color .18s}
 .ntab.on{color:var(--ac)}
-.ntab span{font-size:22px;line-height:1}
+.ntab span{font-size:20px;line-height:1}
 
-/* POS FAB — position:absolute, top:-25px, z-index:1000
-   Parent .ntab-pos-wrap must be overflow:visible */
+/* POS FAB */
 .ntab-pos-wrap{
   flex:1;position:relative;
   display:flex;flex-direction:column;
   align-items:center;justify-content:flex-end;
-  padding-bottom:33px;
-  overflow:visible}
+  padding-bottom:26px;overflow:visible}
 .ntab-pos{
   position:absolute;top:-25px;left:50%;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:3px;
   border:none;background:none;cursor:pointer;padding:0;z-index:1000}
 .ntab-pos:active{transform:translateX(-50%)}
-
 .ntab-pos-bubble{
-  width:56px;height:56px;border-radius:50%;
+  width:50px;height:50px;border-radius:50%;
   background:var(--ac);color:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:26px;line-height:1;
-  box-shadow:0 4px 18px rgba(9, 17, 13, 0.4);
-  border:5px solid var(--bg);
+  font-size:20px;line-height:1;
+  box-shadow:0 4px 16px rgba(45,106,79,.35);
+  border:4px solid var(--bg);
   transition:transform .18s,box-shadow .18s}
 .ntab-pos:active .ntab-pos-bubble{transform:scale(.92)}
-.ntab-pos.on .ntab-pos-bubble{background:var(--ac2);box-shadow:0 4px 22px rgba(14, 22, 18, 0.55)}
-.ntab-pos-label{font-size:10px;font-weight:700;color:var(--ac);margin-top:30px;line-height:1}
+.ntab-pos.on .ntab-pos-bubble{background:var(--ac2)}
+.ntab-pos-label{font-size:10px;font-weight:600;color:var(--ac);margin-top:28px;line-height:1}
 .ntab-pos.on .ntab-pos-label{color:var(--ac2)}
 
 /* ─── SIDEBAR ITEMS ─────────────────────────────────────── */
 .siditem{
-  display:flex;align-items:center;gap:11px;padding:11px 12px;
-  border-radius:10px;cursor:pointer;transition:all .18s;
-  color:var(--tx2);font-size:14px;font-weight:500;margin-bottom:2px}
+  display:flex;align-items:center;gap:12px;padding:11px 14px;
+  border-radius:var(--rs);cursor:pointer;transition:all .18s;
+  color:var(--tx2);font-size:14px;font-weight:500;margin-bottom:2px;
+  min-height:44px}
 .siditem:hover{background:var(--sf2);color:var(--tx)}
-.siditem.on{background:var(--acl);color:var(--ac)}
+.siditem.on{background:var(--acl);color:var(--ac);font-weight:600}
 
 /* ─── BUTTONS ───────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:11px 20px;border-radius:var(--rs);font-size:14px;font-weight:600;
-  cursor:pointer;transition:all .18s;white-space:nowrap;border:none}
-.bp{background:var(--ac);color:#fff}.bp:hover{background:var(--ac2)}
-.bg2{background:transparent;color:var(--tx2);border:1.5px solid var(--bd)}.bg2:hover{background:var(--sf2)}
-.bd2{background:var(--dnl);color:var(--dn);border:1.5px solid var(--dn)}.bd2:hover{background:var(--dn);color:#fff}
-.bsm{padding:7px 13px;font-size:13px;border-radius:7px}
-.blg{padding:14px 28px;font-size:15px;border-radius:var(--r)}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:0 20px;border-radius:var(--rs);font-size:14px;font-weight:600;
+  min-height:44px;cursor:pointer;transition:all .18s;
+  white-space:nowrap;border:none;text-decoration:none}
+.bp{background:var(--ac);color:#fff}
+.bp:hover{background:var(--ac2)}
+.bg2{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}
+.bg2:hover{background:var(--bd)}
+.bd2{background:var(--dnl);color:var(--dn);border:1px solid var(--dn)}
+.bd2:hover{background:var(--dn);color:#fff}
+.bsm{min-height:36px;padding:0 14px;font-size:13px}
+.blg{min-height:52px;padding:0 28px;font-size:15px;border-radius:var(--r)}
+
+/* ─── FORMS ─────────────────────────────────────────────── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:6px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.frow{grid-template-columns:1fr}}
 
 /* ─── CARDS / BADGES ────────────────────────────────────── */
-.card{background:var(--sf);border-radius:var(--r);border:1.5px solid var(--bd);box-shadow:var(--sh)}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.card{
+  background:var(--sf);border-radius:var(--r);
+  padding:20px;border:1px solid var(--bd)}
+.badge{
+  display:inline-flex;align-items:center;
+  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .bg-g{background:var(--acl);color:var(--ac)}
 .bg-r{background:var(--dnl);color:var(--dn)}
 .bg-y{background:var(--wnl);color:var(--wn)}
 .bg-b{background:var(--inl);color:var(--in)}
 
-/* ─── MODALS ────────────────────────────────────────────── */
-/* Checkout panel: fixed, full screen, z-index:2000 */
+/* ─── MODALS / SHEETS ───────────────────────────────────── */
 .backdrop{
-  position:fixed;inset:0;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.52);
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.4);
   z-index:2000;
   display:flex;align-items:flex-end;justify-content:center;
-  padding:0;backdrop-filter:blur(3px)}
+  backdrop-filter:blur(2px)}
 @media(min-width:600px){.backdrop{align-items:center;padding:16px}}
 .msheet{
   background:var(--sf);width:100%;
-  border-radius:24px 24px 0 0;max-height:92dvh;overflow-y:auto;
-  box-shadow:var(--shlg);animation:shUp .22s ease;padding:24px 20px 32px}
+  border-radius:20px 20px 0 0;max-height:92dvh;overflow-y:auto;
+  box-shadow:var(--shlg);animation:shUp .22s ease;
+  padding:24px 20px max(24px,env(safe-area-inset-bottom))}
 @media(min-width:600px){.msheet{border-radius:var(--r);max-height:88dvh;padding:28px}}
 .mlg{max-width:680px}
-@keyframes shUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-.shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 18px}
-
-/* ─── FORMS ─────────────────────────────────────────────── */
-.fg{margin-bottom:10px}
-.fg label{display:block;font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:6px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:500px){.frow{grid-template-columns:1fr}}
-.login-wrap .fg label{text-align:left}
+@keyframes shUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 16px}
 
 /* ─── TABS ──────────────────────────────────────────────── */
 .tabs{
-  display:flex;margin-bottom:0;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  gap:4px;padding:4px 0;border:none!important}
+  display:flex;gap:4px;padding:4px 0;margin-bottom:0;
+  overflow-x:auto;border:none}
 .tabi{
-  padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600;
-  color:var(--tx2);border-radius:20px;transition:all .18s;white-space:nowrap;
-  border:none;background:none;line-height:1.4}
+  padding:7px 16px;cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--tx2);border-radius:20px;transition:all .18s;
+  white-space:nowrap;border:none;background:none;min-height:36px}
 .tabi:hover{background:var(--sf2);color:var(--tx)}
 .tabi.on{color:var(--ac);background:var(--acl)}
 
 /* ─── SEARCH BAR ────────────────────────────────────────── */
 .sbar{position:relative}
-.sbar input{padding:8px 32px 8px 36px;font-size:13px;height:36px}
-.sbic{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px;pointer-events:none;z-index:1}
+.sbar input{padding:10px 36px 10px 38px;font-size:14px;min-height:44px}
+.sbic{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  color:var(--tx3);font-size:16px;pointer-events:none;z-index:1}
 .sbar-x{
-  position:absolute;right:7px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;color:var(--tx3);font-size:13px;
-  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--tx3);
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
   border-radius:50%;padding:0;transition:all .15s}
 .sbar-x:hover{background:var(--bd);color:var(--tx)}
 
@@ -243,88 +252,105 @@ input[type=checkbox]{width:18px;height:18px;accent-color:var(--ac);cursor:pointe
 .cust-card{
   background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);
   overflow:visible;transition:box-shadow .18s}
-.cust-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.09)}
+.cust-card:hover{box-shadow:var(--sh)}
 .cust-row{
-  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  display:flex;align-items:center;gap:12px;padding:13px 16px;
   cursor:pointer;user-select:none;border-radius:var(--rs);
-  transition:background .15s}
+  transition:background .15s;min-height:44px}
 .cust-row:hover{background:var(--sf2)}
 .cust-actions{
-  display:flex;gap:8px;padding:10px 14px 12px;flex-wrap:wrap;
+  display:flex;gap:8px;padding:10px 16px 14px;flex-wrap:wrap;
   border-top:1px solid var(--bd);animation:shUp .15s ease}
 
 /* ─── TOAST ─────────────────────────────────────────────── */
 .toast{
   position:fixed;top:18px;left:50%;transform:translateX(-50%);
   z-index:9999;
-  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);
   padding:12px 20px;box-shadow:var(--shlg);font-size:14px;font-weight:500;
   display:flex;align-items:center;gap:9px;animation:toIn .28s ease;
   max-width:92vw;white-space:nowrap;pointer-events:none}
-@keyframes toIn{from{transform:translateX(-50%) translateY(-12px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+@keyframes toIn{
+  from{transform:translateX(-50%) translateY(-12px);opacity:0}
+  to{transform:translateX(-50%) translateY(0);opacity:1}}
 
 /* ─── PRODUCT CARDS ─────────────────────────────────────── */
 .pcard{
-  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);
-  padding:8px 8px;cursor:pointer;transition:all .18s;text-align:center;user-select:none}
+  background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);
+  padding:12px;cursor:pointer;transition:all .18s;
+  text-align:center;user-select:none;min-height:44px}
 .pcard:hover{border-color:var(--ac);background:var(--acl);transform:translateY(-1px)}
 .pcard:active{transform:scale(.97)}
 
 /* ─── TABLES ────────────────────────────────────────────── */
 .twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r)}
 table{width:100%;border-collapse:collapse;font-size:14px;min-width:360px}
-th{background:var(--sf2);color:var(--tx2);font-size:11px;font-weight:700;
-  padding:10px 14px;text-align:left;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
-td{padding:12px 14px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
+th{
+  background:var(--sf2);color:var(--tx2);font-size:11px;font-weight:700;
+  padding:10px 16px;text-align:left;text-transform:uppercase;
+  letter-spacing:.6px;white-space:nowrap}
+td{padding:14px 16px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--tx)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--sf2)}
 .sticky-th th{position:sticky;top:0;z-index:10;background:var(--sf2)}
 
-/* ─── STATS / PROGRESS ──────────────────────────────────── */
-.pw{background:var(--sf2);border-radius:20px;height:7px;overflow:hidden}
+/* ─── STATS ─────────────────────────────────────────────── */
+.pw{background:var(--sf2);border-radius:20px;height:6px;overflow:hidden}
 .pb{height:100%;border-radius:20px;background:var(--ac);transition:width .4s}
-.sc{background:var(--sf);border-radius:var(--r);padding:18px 16px;border:1.5px solid var(--bd);box-shadow:var(--sh)}
-.sn{font-size:26px;font-weight:800;line-height:1;margin-top:6px}
-.sl{font-size:12px;color:var(--tx2);margin-top:3px;font-weight:500}
+.sc{
+  background:var(--sf);border-radius:var(--r);
+  padding:20px;border:1px solid var(--bd)}
+.sn{font-size:24px;font-weight:700;line-height:1;margin-top:6px}
+.sl{font-size:12px;color:var(--tx2);margin-top:4px;font-weight:500}
 
 /* ─── MISC ──────────────────────────────────────────────── */
 .rfont{font-family:'Courier New',monospace;font-size:13px;line-height:1.7}
 .hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.sdot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s infinite}
+.sdot{width:8px;height:8px;border-radius:50%;background:#22c55e;
+  display:inline-block;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .sdot.off{background:var(--wn)!important;animation:none}
-.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--ac);margin:0 5px;transition:background .18s}
+.pin-dot{
+  width:13px;height:13px;border-radius:50%;
+  border:2px solid var(--ac);margin:0 5px;transition:background .18s}
 .pin-dot.on{background:var(--ac)}
-.pin-key{width:68px;height:68px;border-radius:50%;font-size:22px;font-weight:700;background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx)}
+.pin-key{
+  width:68px;height:68px;border-radius:50%;
+  font-size:22px;font-weight:600;
+  background:var(--sf2);border:1px solid var(--bd);color:var(--tx)}
 .pin-key:hover{background:var(--acl);border-color:var(--ac);color:var(--ac)}
 @media(max-width:380px){.pin-key{width:58px;height:58px;font-size:19px}}
-@media print{body *{visibility:hidden}.printable,.printable *{visibility:visible}.printable{position:fixed;inset:0;padding:20px}}
+@media print{
+  body *{visibility:hidden}
+  .printable,.printable *{visibility:visible}
+  .printable{position:fixed;inset:0;padding:20px}}
 
 /* ─── CART ROWS ─────────────────────────────────────────── */
-.crow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.crow{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 0;border-bottom:1px solid var(--bd)}
 .crow:last-child{border-bottom:none}
-.qbtn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;
-  border-radius:7px;border:1.5px solid var(--bd);background:var(--sf2);
+.qbtn{
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;border:1px solid var(--bd);background:var(--sf2);
   font-size:16px;font-weight:700;color:var(--tx);cursor:pointer;transition:all .15s}
 .qbtn:hover{border-color:var(--ac);color:var(--ac)}
 .qbtn:active{background:var(--acl)}
 
 /* ─── POS GRID ──────────────────────────────────────────── */
-.pos-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;height:100%;min-height:0}
+.pos-grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
 @media(max-width:1000px){.pos-grid{grid-template-columns:1fr 280px}}
 @media(max-width:768px){
-  /* On mobile: single column — cart panel hidden (FAB+drawer handles it) */
-  .pos-grid{display:block;height:auto}
-  .pos-cart-col{display:none!important}
-  padding-bottom: 80px;
-}
+  .pos-grid{display:block}
+  .pos-cart-col{display:none!important}}
 
 /* ─── MOBILE CART DRAWER ────────────────────────────────── */
 .cart-fab{
-  display:none;position:fixed;bottom:calc(var(--nav-h) + 10px);right:16px;
+  display:none;position:fixed;bottom:calc(var(--nav-h) + 12px);right:16px;
   z-index:1000;
-  width:52px;height:52px;border-radius:50%;background:var(--ac);color:#fff;
-  font-size:22px;box-shadow:0 4px 18px rgba(201, 119, 119, 0.22);
+  width:52px;height:52px;border-radius:50%;
+  background:var(--ac);color:#fff;
+  font-size:22px;box-shadow:0 4px 18px rgba(45,106,79,.3);
   align-items:center;justify-content:center;
   flex-direction:column;gap:0;border:none;cursor:pointer}
 .cart-fab:active{transform:scale(.93)}
@@ -332,13 +358,17 @@ tr:hover td{background:var(--sf2)}
 .cart-fab-badge{
   position:absolute;top:-4px;right:-4px;background:var(--dn);color:#fff;
   border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;border:2px solid var(--sf);padding:0 2px}
-.mob-cart-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:1800}
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--sf);padding:0 2px}
+.mob-cart-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.4);z-index:1800}
 .mob-cart-ov.open{display:block}
 .mob-cart-drawer{
   position:fixed;bottom:0;left:0;right:0;z-index:1900;
-  background:var(--sf);border-radius:22px 22px 0 0;max-height:82dvh;
-  box-shadow:var(--shlg);padding:0 18px max(18px,env(safe-area-inset-bottom));
+  background:var(--sf);border-radius:20px 20px 0 0;max-height:82dvh;
+  box-shadow:var(--shlg);
+  padding:0 20px max(20px,env(safe-area-inset-bottom));
   display:flex;flex-direction:column;
   transform:translateY(100%);transition:transform .28s ease}
 .mob-cart-drawer.open{transform:translateY(0)}
@@ -347,49 +377,44 @@ tr:hover td{background:var(--sf2)}
 [data-tip]{position:relative}
 [data-tip]:hover::after{
   content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;
-  transform:translateX(-50%);background:var(--tx);color:var(--sf);font-size:11px;font-weight:500;
-  padding:4px 9px;border-radius:6px;white-space:nowrap;z-index:9999;pointer-events:none;
-  font-family:'Poppins',sans-serif;opacity:.95;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  transform:translateX(-50%);background:var(--tx);color:var(--sf);
+  font-size:11px;font-weight:500;padding:4px 9px;border-radius:6px;
+  white-space:nowrap;z-index:9999;pointer-events:none;
+  font-family:'Poppins',sans-serif;opacity:.95}
 [data-tip]:hover::before{
   content:"";position:absolute;bottom:calc(100% + 1px);left:50%;
-  transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tx);
-  z-index:9999;pointer-events:none}
+  transform:translateX(-50%);border:5px solid transparent;
+  border-top-color:var(--tx);z-index:9999;pointer-events:none}
 
 /* ─── MOBILE DENSE LAYOUT ───────────────────────────────── */
-/* Mobile-only responsive visibility */
 @media(max-width:768px){
   #reports-tab{display:block!important}
   #mob-reports-link{display:block!important}
   #mob-logout-store{display:block!important}
 }
-/* Edge-to-edge cards, zero side padding on mobile */
 @media(max-width:768px){
   .pg-body>.card,
   .pg-body>.cust-card,
   .pg-body>div>.card{
     border-radius:0!important;
-    border-left:none!important;
-    border-right:none!important;
-    margin-left:0!important;
-    margin-right:0!important;
+    border-left:none!important;border-right:none!important;
+    margin-left:0!important;margin-right:0!important;
     box-shadow:none!important}
-  .pg-body .card{padding:12px 14px!important}
+  .pg-body .card{padding:16px!important}
   .sc{
     border-radius:0!important;
     border-left:none!important;border-right:none!important;
-    padding:10px 12px!important;margin:0!important;box-shadow:none!important}
-  /* Exempt Reports stat cards from the edge-to-edge strip */
+    padding:14px 16px!important;margin:0!important;box-shadow:none!important}
   .rpt-stats .sc{
     border-radius:var(--r)!important;
-    border-left:1.5px solid var(--bd)!important;
-    border-right:1.5px solid var(--bd)!important;
-    padding:18px 18px!important;
-  .cust-card{border-radius:0!important;border-left:none!important;border-right:none!important}
+    border:1px solid var(--bd)!important;
+    padding:16px!important}
+  .cust-card{
+    border-radius:0!important;
+    border-left:none!important;border-right:none!important}
   .cust-row{border-radius:0!important}
   .pg-body [style*="minmax(280px"]{gap:8px!important}
-  /* Dashboard recent+bestselling: keep a real gap on mobile */
   .dash-grid{gap:12px!important}
-  /* Reports stat grid: keep gap */
   .rpt-stats{gap:8px!important;padding:0 16px!important}
   .pg-body [style*="minmax(140px"]{gap:2px!important}
   .pg-body [style*="borderRadius:16"]{
@@ -987,7 +1012,8 @@ function Dashboard({db,setPage}){
             ))}
           </div>
         </div>
-      </div>{/* pg-body */}
+      
+        <div className="pg-spacer"/></div>{/* pg-body */}
     </div>
   );
 }
@@ -1204,7 +1230,7 @@ function POS({db,saveData,setConfirm}){
   const openCheckout=()=>{if(cart.length===0){toast("Cart is empty!","warn");return;}setCheckoutOpen(true);};
 
   return(
-    <div style={{display:"contents"}}>
+    <div className="pg-page">
       {priceModal&&(
         <div className="backdrop">
           <div className="msheet" style={{maxWidth:360,alignSelf:"center",textAlign:"center",borderRadius:"var(--r)"}}>
@@ -1283,41 +1309,36 @@ function POS({db,saveData,setConfirm}){
         </div>
       </div>
 
-      {/* POS page: header pinned, grid scrolls beneath */}
-      <div className="pg-page">
-        <div className="pg-hdr">
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,flexWrap:"wrap",gap:10}}>
-            <h1 style={{fontSize:19,fontWeight:800}}>🛒 Point of Sale</h1>
-          </div>
-          <SearchBar value={search} onChange={setSearch} placeholder="Search product…"/>
-          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
-            {cats.map(c=><button key={c} className={`btn bsm ${catFilter===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatFilter(c)}>{c}</button>)}
-          </div>
+      {/* POS page: header pinned, body scrolls beneath */}
+      <div className="pg-hdr">
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,flexWrap:"wrap",gap:10}}>
+          <h1 style={{fontSize:19,fontWeight:800}}>🛒 Point of Sale</h1>
         </div>
+        <SearchBar value={search} onChange={setSearch} placeholder="Search product…"/>
+        <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
+          {cats.map(c=><button key={c} className={`btn bsm ${catFilter===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatFilter(c)}>{c}</button>)}
+        </div>
+      </div>
 
-        <div className="pg-body" style={{display:"flex",flexDirection:"column",padding:5}}>
-          <div className="pos-grid" style={{flex:1,minHeight:0}}>
-            <div style={{display:"flex",flexDirection:"column",minHeight:0}}>
-              <div style={{overflowY:"auto",flex:1}}>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(115px,1fr))",gap:10}}>
-                  {filtered.map(p=>(
-                    <div key={p.id} className="pcard" style={{opacity:p.stock<=0?.45:1}} onClick={()=>handleProdClick(p)}>
-                      <div style={{fontSize:28,marginBottom:6}}>{CAT_EMOJI(p.category)}</div>
-                      <div style={{fontSize:12,fontWeight:700,lineHeight:1.3,marginBottom:3}}>{p.name}</div>
-                      <div style={{fontSize:13,color:"var(--ac)",fontWeight:800}}>{p.isOpenPrice?"Open Price":fmt(p.price)}</div>
-                      <div style={{fontSize:11,color:p.stock<=5?"var(--wn)":"var(--tx3)",marginTop:2}}>{p.stock} left</div>
-                    </div>
-                  ))}
-                  {filtered.length===0&&<div style={{gridColumn:"1/-1",padding:32,textAlign:"center",color:"var(--tx3)",fontSize:14}}>No products found</div>}
-                </div>
+      <div className="pg-body">
+        <div className="pos-grid">
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(115px,1fr))",gap:10}}>
+            {filtered.map(p=>(
+              <div key={p.id} className="pcard" style={{opacity:p.stock<=0?.45:1}} onClick={()=>handleProdClick(p)}>
+                <div style={{fontSize:28,marginBottom:6}}>{CAT_EMOJI(p.category)}</div>
+                <div style={{fontSize:12,fontWeight:700,lineHeight:1.3,marginBottom:3}}>{p.name}</div>
+                <div style={{fontSize:13,color:"var(--ac)",fontWeight:800}}>{p.isOpenPrice?"Open Price":fmt(p.price)}</div>
+                <div style={{fontSize:11,color:p.stock<=5?"var(--wn)":"var(--tx3)",marginTop:2}}>{p.stock} left</div>
               </div>
-            </div>
-            <div className="card pos-cart-col" style={{display:"flex",flexDirection:"column",overflow:"hidden",padding:18}}>
-              <CartContent/>
-            </div>
+            ))}
+            {filtered.length===0&&<div style={{gridColumn:"1/-1",padding:32,textAlign:"center",color:"var(--tx3)",fontSize:14}}>No products found</div>}
+          </div>
+          <div className="card pos-cart-col" style={{display:"flex",flexDirection:"column",overflow:"hidden",padding:18}}>
+            <CartContent/>
           </div>
         </div>
-      </div>{/* /pg-page */}
+        <div className="pg-spacer"/>
+      </div>
     </div>
   );
 }
@@ -1442,7 +1463,8 @@ function Inventory({db,saveData,setConfirm}){
               );
             })}
           </div>
-        </div>
+        
+          <div className="pg-spacer"/></div>
       </div>{/* /pg-page */}
     </div>
   );
@@ -1785,7 +1807,8 @@ function Utang({db,saveData,setConfirm}){
             </div>
             );
           })}
-        </div>
+        
+          <div className="pg-spacer"/></div>
       </div>{/* /pg-page */}
     </div>
   );
@@ -1943,7 +1966,8 @@ function Reports({db}){
           }
         </div>
       </div>
-    </div>
+    
+      <div className="pg-spacer"/></div>
   );
 }
 
@@ -2249,6 +2273,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
         )}
       </div>
 
-    </div>
+    
+      <div className="pg-spacer"/></div>
   );
-} 
+}
