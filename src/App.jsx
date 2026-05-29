@@ -504,6 +504,12 @@ const fromExcel=file=>new Promise((res,rej)=>{
 let _fb=null,_storeKey="store_default",_fbReady=false;
 const _FB_DB_URL="https://j7vj7f-default-rtdb.asia-southeast1.firebasedatabase.app";
 
+/* Restore tenant key immediately on load (survives page refresh) */
+{
+  const saved=sessionStorage.getItem("sari_store_key");
+  if(saved)_storeKey=saved;
+}
+
 const loadFB=()=>new Promise(res=>{
   if(_fbReady&&_fb){res(_fb);return;}
   const ls=src=>new Promise((r,j)=>{
@@ -527,11 +533,15 @@ const loadFB=()=>new Promise(res=>{
 });
 
 /* ═══════════════════════════════════════════
-   LOCAL STORAGE
+   LOCAL STORAGE — per-tenant namespacing
+   Each store owner's data lives under its own key:
+   sari_v7_store_{username}  (e.g. sari_v7_store_ligaya)
+   _storeKey is set at login time before getLS/setLS are ever called.
 ═══════════════════════════════════════════ */
-const LS_KEY="sari_v7";
-const getLS=()=>{try{return JSON.parse(localStorage.getItem(LS_KEY))||{};}catch{return{};}};
-const setLS=d=>{try{localStorage.setItem(LS_KEY,JSON.stringify(d));}catch{}};
+const LS_KEY_PREFIX="sari_v7";
+const getLSKey=()=>`${LS_KEY_PREFIX}_${_storeKey}`;
+const getLS=()=>{try{return JSON.parse(localStorage.getItem(getLSKey()))||{};}catch{return{};}};
+const setLS=d=>{try{localStorage.setItem(getLSKey(),JSON.stringify(d));}catch{}};
 
 const SEED=()=>{
   const now=new Date().toISOString(),c1=uid(),c2=uid();
@@ -586,7 +596,10 @@ function SearchBar({value,onChange,placeholder="Search…",style={}}){
    ROOT APP
 ═══════════════════════════════════════════ */
 export default function App(){
-  const [db,       setDb]      = useState(()=>initDB());
+  const [db,       setDb]      = useState(()=>{
+    // _storeKey already restored from sessionStorage at module load
+    return initDB();
+  });
   const [dark,     setDark]    = useState(()=>getLS().settings?.darkMode||false);
   const [page,     setPage]    = useState("dashboard");
   const [toastS,   setToastS]  = useState(null);
@@ -674,7 +687,7 @@ export default function App(){
   },[]);
 
   useEffect(()=>{
-    const h=e=>{if(e.key===LS_KEY)setDb({...getLS()});};
+    const h=e=>{if(e.key===getLSKey())setDb({...getLS()});};
     window.addEventListener("storage",h);
     return()=>window.removeEventListener("storage",h);
   },[]);
@@ -686,9 +699,11 @@ export default function App(){
     if(loginF.u===au&&loginF.p===ap){
       _storeKey=`store_${loginF.u}`;
       sessionStorage.setItem("sari_auth","1");
+      sessionStorage.setItem("sari_store_key",_storeKey);
       setAuthCreds({u:loginF.u,p:loginF.p});
       setLoggedIn(true);
-      const d=getLS();
+      const d=initDB(); // loads or seeds data for THIS tenant
+      setDb({...d});
       if(d.settings?.pinEnabled&&d.settings?.pin)setPinShow(true);
       else setPinOk(true);
     }else{
@@ -767,8 +782,10 @@ export default function App(){
   const logout=()=>setConfirm({title:"Log Out",msg:"Are you sure you want to log out?",icon:<FontAwesomeIcon icon={faRightFromBracket} />,danger:true,confirmText:"Log Out",
     onConfirm:()=>{
       sessionStorage.removeItem("sari_auth");
+      sessionStorage.removeItem("sari_store_key");
       sessionStorage.clear();
       try{localStorage.removeItem("sari_auth");}catch{}
+      _storeKey="store_default";
       setLoggedIn(false);
       setPinOk(false);
       setPinShow(false);
@@ -2201,12 +2218,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
               {t.icon&&<FontAwesomeIcon icon={t.icon} style={{marginRight:6}}/>}{t.label}
             </div>
           ))}
-          {/* Reports tab — mobile only */}
-          <div className="tabi" id="reports-tab"
-            style={{display:"none"}}
-            onClick={()=>setPage("reports")}>
-            📈 Reports
-          </div>
+
         </div>
       </div>
 
