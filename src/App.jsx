@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash} from "@fortawesome/free-solid-svg-icons";
+import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash,faDownload} from "@fortawesome/free-solid-svg-icons";
 
 /* ── FONT ── */
 {
@@ -1303,8 +1303,8 @@ function POS({db,saveData,setConfirm}){
               </div>
             </div>
             <div style={{display:"flex",gap:10,marginBottom:16}}>
-              <button className={`btn ${!utangMode?"bp":"bg2"}`} style={{flex:1}} onClick={()=>setUtangMode(false)}>💵 Cash</button>
-              <button className={`btn ${utangMode?"bp":"bg2"}`}  style={{flex:1}} onClick={()=>setUtangMode(true)}>📋 Utang</button>
+              <button className={`btn ${!utangMode?"bp":"bg2"}`} style={{flex:1}} onClick={()=>setUtangMode(false)}><FontAwesomeIcon icon={faHandHoldingDollar} /> Cash</button>
+              <button className={`btn ${utangMode?"bp":"bg2"}`}  style={{flex:1}} onClick={()=>setUtangMode(true)}><FontAwesomeIcon icon={faClipboardList} /> Utang</button>
             </div>
             {!utangMode?(
               <div className="fg">
@@ -1460,7 +1460,7 @@ function Inventory({db,saveData,setConfirm}){
       d.products=(d.products||[]).map(p=>p.id===clean.id?clean:p);
     }
     await saveData(d);setModal(false);setEditP(null);
-    toast(isNew?"Product added! ✅":"Product updated! ✅");okBeep();
+    toast(isNew?"Product added!":"Product updated!");okBeep();
   };
 
   const handleDelete=p=>setConfirm({
@@ -1881,7 +1881,7 @@ function CustForm({init,onSave,onClose}){
         <button className="btn bp" style={{flex:1}} onClick={()=>{
           if(form.contact&&form.contact.length>0&&form.contact.length<11){toast("Contact number must be exactly 11 digits!","err");return;}
           onSave(form,isNew);
-        }}>💾 Save</button>
+        }}><FontAwesomeIcon icon={faFloppyDisk} /> Save</button>
       </div>
     </div>
   );
@@ -1948,8 +1948,7 @@ function Reports({db}){
       <div className="pg-hdr">
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10,marginBottom:10}}>
           <h1 style={{fontSize:19,fontWeight:800}}>📈 Reports</h1>
-          <button className="btn bp bsm" onClick={doExport} disabled={busy}>
-            {busy?"⏳ Exporting…":"📊 Export Excel"}
+          <button className="btn bp bsm" onClick={doExport} disabled={busy}>{busy ? ("⏳ Exporting…") : (<><FontAwesomeIcon icon={faDownload} /> Export Excel</>)}
           </button>
         </div>
         <div className="tabs" style={{borderBottom:"none"}}>
@@ -1984,11 +1983,11 @@ function Reports({db}){
           ))}
         </div>
         <div className="card" style={{padding:18}}>
-          <h3 style={{fontWeight:700,marginBottom:4,fontSize:14}}>Transaction Log</h3>
+          <h3 style={{fontWeight:600,marginBottom:4,fontSize:14}}>Transaction Log</h3>
           {filtered.length===0
             ?<p style={{color:"var(--tx3)",fontSize:13,textAlign:"center",padding:"20px 0"}}>No transactions in this period.</p>
             :filtered.slice(0,50).map(t=>(
-              <div key={t.id} style={{padding:"10px 0",borderBottom:"1px solid var(--bd)",display:"flex",flexDirection:"column",gap:4}}>
+              <div key={t.id} style={{padding:"5px 0",borderBottom:"1px solid var(--bd)",display:"flex",flexDirection:"column",gap:4}}>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
                   <div style={{display:"flex",alignItems:"center",gap:7,flexWrap:"wrap"}}>
                     <span style={{fontSize:12,fontWeight:600,color:"var(--tx2)"}}>{fmtDate(t.date)}</span>
@@ -2183,11 +2182,10 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
 
   /* Mobile: all tabs including Reports link; Desktop: all tabs */
   const settingsTabs=[
-    {id:"store",    label:"🏪 Store"},
-    {id:"security", label:"🔒 Security"},
-    {id:"backup",   label:"💾 Backup"},
-    {id:"reports",  label:"📈 Reports", mobileOnly:true},
-    {id:"danger",   label:"⚠️ Danger"},
+    {id:"store",    label:"Store",    icon:faStore},
+    {id:"security", label:"Security", icon:faLock},
+    {id:"backup",   label:"Backup",   icon:faFloppyDisk},
+    {id:"danger",   label:"Danger",   icon:faTriangleExclamation},
   ];
 
   return(
@@ -2200,7 +2198,7 @@ function SettingsPage({db,saveData,dark,toggleDark,setConfirm,logout,setPage}){
         <div className="tabs" style={{borderBottom:"none"}}>
           {settingsTabs.filter(t=>!t.mobileOnly).map(t=>(
             <div key={t.id} className={`tabi ${tab===t.id?"on":""}`} onClick={()=>setTab(t.id)}>
-              {t.label}
+              {t.icon&&<FontAwesomeIcon icon={t.icon} style={{marginRight:6}}/>}{t.label}
             </div>
           ))}
           {/* Reports tab — mobile only */}
