@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { auth, db as rtdb } from "./firebaseConfig";
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, deleteUser, signOut } from "firebase/auth";
 import { ref as dbRef, get as dbGet, set as dbSet, onValue } from "firebase/database";
-import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash,faDownload,faWallet,faMobileScreenButton,faCircleQuestion,faEnvelope,faPaperPlane,faEllipsis,faCircleUser,faChevronDown,faBookOpen,faCalendarDay,faCalendarWeek,faCalendarDays,faInfinity} from "@fortawesome/free-solid-svg-icons";
+import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash,faDownload,faWallet,faMobileScreenButton,faCircleQuestion,faEnvelope,faPaperPlane,faEllipsis,faCircleUser,faChevronDown,faBookOpen,faCalendarDay,faCalendarWeek,faCalendarDays,faInfinity,faFileLines,faSquarePlus,faCircleInfo} from "@fortawesome/free-solid-svg-icons";
 
 /* ── FONT ── */
 {
@@ -602,6 +602,42 @@ tr:hover td{background:var(--sf2)}
   padding:7px 8px}
 .pf-tabs .tabi:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 @media(max-width:400px){.pf-tabs .tabi svg{display:none}}
+
+/* ─── GCASH RATE CHARGE GUIDE ───────────────────────────── */
+.rg-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.rg-head{display:flex;align-items:center;gap:6px;padding:6px 10px 6px 0;background:var(--inl)}
+.rg-toggle{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:10px 4px 10px 14px;text-align:left;color:var(--tx);border-radius:var(--r)}
+.rg-ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:38px;height:38px;border-radius:10px;background:var(--sf);color:var(--in);font-size:16px}
+.rg-title{display:block;font-size:14px;font-weight:700;line-height:1.3}
+.rg-sub{display:block;font-size:12px;color:var(--tx2);line-height:1.35}
+.rg-body{padding:12px 16px 16px}
+.rg-ibtn{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;
+  height:38px;min-width:38px;padding:0 12px;border-radius:10px;border:1px solid var(--bd);
+  background:var(--sf);color:var(--tx);font-size:13px;font-weight:600}
+.rg-ibtn:hover{border-color:var(--ac);color:var(--ac)}
+.rg-ibtn.ghost{border-color:transparent;background:none;color:var(--tx3);padding:0}
+.rg-ibtn.ghost:hover{background:var(--sf);color:var(--tx)}
+.rg-ibtn:focus-visible,.rg-clear:focus-visible,.rg-toggle:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media(max-width:480px){.rg-ibtn .rg-lbl{display:none}.rg-ibtn:not(.ghost){padding:0}}
+.rg-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.rg-tbl{border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden}
+/* phones: one table, one header, scrolls inside the card */
+.rg-scroll{max-height:min(44dvh,340px);overflow-y:auto;overscroll-behavior:contain}
+.rg-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 14px;font-size:13px;border-top:1px solid var(--bd)}
+.rg-row.h{background:var(--sf2);font-size:12px;font-weight:700;color:var(--tx2);border-top:none;padding:10px 14px;
+  position:sticky;top:0;z-index:1}
+.rg-row.h span:last-child{text-align:right}
+.rg-row b{color:var(--ac);text-align:right;font-variant-numeric:tabular-nums}
+.rg-row.hit{background:var(--acl);box-shadow:inset 3px 0 0 var(--ac);font-weight:700}
+@media(max-width:768px){
+  .rg-body{padding:10px 12px 12px}
+  .rg-row{padding:5px 12px;font-size:12.5px}
+  .rg-row.h{padding:8px 12px;font-size:11px}
+}
+.rg-edit-row{display:grid;grid-template-columns:1fr 1fr 1fr 40px;gap:8px;align-items:center;margin-bottom:8px}
+.rg-edit-row input{padding:8px 10px;min-height:40px;font-size:13px}
+.rg-edit-row.h{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.rg-sug{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-4px 0 14px;padding:8px 12px;background:var(--inl);color:var(--in);border-radius:var(--rs);font-size:12.5px;font-weight:500}
 
 `;
   document.head.appendChild(gs);
@@ -2742,6 +2778,10 @@ function SettingsPage({db,saveData,setConfirm,page,setPage}){
           ["id","date","network","mobile","amount","fee","feeVia","customer","ref"],
           ...asArr(d.eloadTransactions).map(t=>[t.id,t.date,t.network,String(t.mobile||""),t.amount,t.fee,t.feeVia,t.customer||"",t.ref||""])
         ]},
+        {name:"GCashRates",rows:[
+          ["min","max","fee"],
+          ...getRates(d).map(r=>[r.min,r.max,r.fee])
+        ]},
         {name:"GCashConfig",rows:[
           ["initialCash","initialGcash"],
           [Number(d.gcashConfig?.initialCash)||0,Number(d.gcashConfig?.initialGcash)||0]
@@ -2811,6 +2851,11 @@ function SettingsPage({db,saveData,setConfirm,page,setPage}){
                   customer:sanitize(r.customer||"").slice(0,100),ref:sanitize(String(r.ref||"")).slice(0,50)
                 };
               }).filter(t=>t.amount>0);
+            }
+            if(sheets.GCashRates){
+              const rr=(sheets.GCashRates||[]).map(r=>({id:uid(),min:r2(parseFloat(r.min)),max:r2(parseFloat(r.max)),fee:Math.max(0,r2(parseFloat(r.fee)))}))
+                .filter(r=>r.max>=r.min&&r.max>0);
+              if(rr.length)d.gcashRates=rr;
             }
             if(sheets.GCashConfig&&sheets.GCashConfig[0]){
               const c=sheets.GCashConfig[0];
@@ -3096,12 +3141,192 @@ function Seg({value,onChange,options,cols}){
   );
 }
 
-function StatCard({label,value,color,sub}){
+function StatCard({label,value,color,sub,icon}){
   return(
-    <div className="sc" style={{minWidth:0}}>
-      <div className="sl" style={{marginTop:0}}>{label}</div>
-      <div className="sn" style={{color,fontSize:"clamp(16px,4.6vw,22px)",overflowWrap:"anywhere"}}>{value}</div>
-      {sub&&<div style={{fontSize:11,color:"var(--tx3)",marginTop:6}}>{sub}</div>}
+    <div className="sc" style={{minWidth:0,display:"flex",gap:12,alignItems:"flex-start"}}>
+      {icon&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",flexShrink:0,width:44,height:44,borderRadius:12,
+        background:`color-mix(in srgb, ${color} 14%, transparent)`,color,fontSize:20}}><FontAwesomeIcon icon={icon}/></span>}
+      <div style={{minWidth:0,flex:1}}>
+        <div className="sl" style={{marginTop:0}}>{label}</div>
+        <div className="sn" style={{color,fontSize:"clamp(16px,4.6vw,22px)",overflowWrap:"anywhere"}}>{value}</div>
+        {sub&&<div style={{fontSize:11,color:"var(--tx3)",marginTop:6}}>{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+/* ── GCash Rate Charge Guide: default table, lookup, card and editor ── */
+const defaultGcashRates=()=>{
+  const r=[{id:"r0",min:1,max:500,fee:10}];
+  for(let i=1;i<20;i++)r.push({id:`r${i}`,min:i*500+1,max:(i+1)*500,fee:10*(i+1)});
+  return r;
+};
+const getRates=d=>{
+  const list=asArr(d?.gcashRates).filter(r=>r&&Number.isFinite(Number(r.min))&&Number.isFinite(Number(r.max)));
+  return (list.length?list:defaultGcashRates()).map(r=>({id:String(r.id||uid()),min:Number(r.min),max:Number(r.max),fee:Number(r.fee)||0}))
+    .sort((a,b)=>a.min-b.min);
+};
+const findRate=(rates,amt)=>{
+  if(!Number.isFinite(amt)||amt<=0)return null;
+  const r=rates.find(x=>amt<=x.max);
+  return r&&amt>=r.min-0.99?r:null;
+};
+const findFee=(rates,amt)=>findRate(rates,amt)?.fee??null;
+const RG_OPEN_KEY="sari_rate_guide_open";
+const readRgOpen=()=>{try{return localStorage.getItem(RG_OPEN_KEY)!=="0";}catch{return true;}};
+const fmtRange=r=>`₱${r.min.toLocaleString("en-PH")} – ₱${r.max.toLocaleString("en-PH")}`;
+
+function GCashRateGuide({rates,onEdit}){
+  const [open,setOpenRaw]=useState(readRgOpen);
+  const [q,setQ]=useState("");
+  const [narrow,setNarrow]=useState(()=>typeof window!=="undefined"&&window.matchMedia("(max-width:768px)").matches);
+  const hitRef=useRef(null);
+  const setOpen=fn=>setOpenRaw(prev=>{
+    const next=typeof fn==="function"?fn(prev):fn;
+    try{localStorage.setItem(RG_OPEN_KEY,next?"1":"0");}catch{}
+    return next;
+  });
+  useEffect(()=>{
+    const mq=window.matchMedia("(max-width:768px)");
+    const h=e=>setNarrow(e.matches);
+    mq.addEventListener("change",h);
+    return()=>mq.removeEventListener("change",h);
+  },[]);
+  const amt=parseMoney(q);
+  const hit=q.trim()===""?null:findRate(rates,amt);
+  const notFound=q.trim()!==""&&!hit;
+  /* keep the matched row visible inside the scrolling table */
+  useEffect(()=>{if(hit)hitRef.current?.scrollIntoView({block:"nearest"});},[hit?.id,open,narrow]);
+  const half=Math.ceil(rates.length/2);
+  const cols=!narrow&&rates.length>10?[rates.slice(0,half),rates.slice(half)]:[rates];
+  const renderTable=(col,ci)=>narrow?(
+    /* inline styles on purpose: this list must look the same even if an older stylesheet is still around */
+    <div key={ci} style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,alignContent:"start",
+      maxHeight:"min(44dvh,340px)",overflowY:"auto",overscrollBehavior:"contain"}}>
+      {col.map(r=>{
+        const on=hit&&hit.id===r.id;
+        return(
+          <div key={r.id} ref={on?hitRef:null}
+            style={{display:"flex",flexDirection:"column",gap:1,minWidth:0,padding:"9px 12px",
+              background:on?"var(--acl)":"var(--sf2)",borderRadius:"var(--rs)",
+              border:`1px solid ${on?"var(--ac)":"transparent"}`,fontVariantNumeric:"tabular-nums"}}>
+            <b style={{fontSize:16,fontWeight:800,lineHeight:1.25,color:"var(--ac)"}}>{fmt(r.fee).replace(".00","")}</b>
+            <span style={{fontSize:12,color:on?"var(--ac)":"var(--tx2)",fontWeight:on?600:400,whiteSpace:"nowrap",
+              overflow:"hidden",textOverflow:"ellipsis"}}>
+              ₱{r.min.toLocaleString("en-PH")}–{r.max.toLocaleString("en-PH")}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  ):(
+    <div key={ci} className="rg-tbl">
+      <div className="rg-row h"><span>Transaction Amount</span><span>Rate Charge</span></div>
+      {col.map(r=>(
+        <div key={r.id} ref={hit&&hit.id===r.id?hitRef:null} className={`rg-row${hit&&hit.id===r.id?" hit":""}`}>
+          <span>{fmtRange(r)}</span><b>{fmt(r.fee).replace(".00","")}</b>
+        </div>
+      ))}
+    </div>
+  );
+  return(
+    <div className="rg-card">
+      <div className="rg-head">
+        <button type="button" className="rg-toggle" aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
+          <span className="rg-ic"><FontAwesomeIcon icon={faFileLines}/></span>
+          <span style={{minWidth:0}}>
+            <span className="rg-title" style={{whiteSpace:"normal",overflow:"visible",textOverflow:"clip"}}>GCash Rate Charge Guide</span>
+            <span className="rg-sub" style={{whiteSpace:"normal",overflow:"visible",textOverflow:"clip"}}>Fees by transaction amount</span>
+          </span>
+        </button>
+        <button type="button" className="rg-ibtn" aria-label="Edit rate guide" onClick={onEdit}>
+          <FontAwesomeIcon icon={faPen}/><span className="rg-lbl">Edit</span>
+        </button>
+        <button type="button" className="rg-ibtn ghost" aria-label={open?"Collapse guide":"Expand guide"} aria-expanded={open}
+          onClick={()=>setOpen(o=>!o)}>
+          <FontAwesomeIcon icon={faChevronDown} className={`gd-chev ${open?"open":""}`}/>
+        </button>
+      </div>
+      {open&&(
+        <div className="rg-body">
+          <div className="sbar" style={{marginBottom:10}}>
+            <span className="sbic"><FontAwesomeIcon icon={faMagnifyingGlass}/></span>
+            <input type="number" inputMode="decimal" min="0" step="0.01" max={MAX_AMT} onKeyDown={blockNumKeys}
+              aria-label="Look up fee for an amount" placeholder="Search amount…" value={q}
+              onChange={e=>setQ(e.target.value)} enterKeyHint="search"
+              style={{paddingRight:hit||notFound?128:34}}/>
+            {(hit||notFound)&&(
+              <span role="status" aria-live="polite"
+                style={{position:"absolute",right:38,top:"50%",transform:"translateY(-50%)",pointerEvents:"none",
+                  background:"none",padding:0,margin:0,border:"none",whiteSpace:"nowrap",
+                  fontSize:13,fontWeight:hit?800:600,color:hit?"var(--ac)":"var(--wn)"}}>
+                {hit?`Fee ${fmt(hit.fee).replace(".00","")}`:"Not in guide"}
+              </span>
+            )}
+            {q!==""&&(
+              <button type="button" className="sbar-x" aria-label="Clear amount" onClick={()=>setQ("")}>
+                <FontAwesomeIcon icon={faXmark}/>
+              </button>
+            )}
+          </div>
+          <div className="rg-cols" style={narrow?{gridTemplateColumns:"1fr"}:undefined}>
+            {cols.map(renderTable)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GCashRateEditor({rates,onSave,onClose}){
+  const [rows,setRows]=useState(()=>rates.map(r=>({id:r.id,min:String(r.min),max:String(r.max),fee:String(r.fee)})));
+  const [busy,setBusy]=useState(false);
+  const set=(id,k,v)=>setRows(p=>p.map(r=>r.id===id?{...r,[k]:v}:r));
+  const add=()=>setRows(p=>{
+    const last=p[p.length-1];
+    const nextMin=last&&Number.isFinite(Number(last.max))?Number(last.max)+1:1;
+    return[...p,{id:uid(),min:String(nextMin),max:"",fee:""}];
+  });
+  const del=id=>setRows(p=>p.filter(r=>r.id!==id));
+  const submit=async()=>{
+    const out=[];
+    for(const r of rows){
+      const min=parseMoney(r.min),max=parseMoney(r.max),fee=parseMoney(r.fee);
+      if(![min,max,fee].every(Number.isFinite)||min<0||max<min||fee<0){
+        toast("Check the rows: every range needs valid From, To and Fee values.","err");errBeep();return;
+      }
+      if(max>MAX_AMT||fee>MAX_AMT){toast("Amount is too large!","err");errBeep();return;}
+      out.push({id:r.id,min:r2(min),max:r2(max),fee:r2(fee)});
+    }
+    if(!out.length){toast("Add at least one rate.","err");errBeep();return;}
+    out.sort((a,b)=>a.min-b.min);
+    for(let i=1;i<out.length;i++)if(out[i].min<=out[i-1].max){toast("Ranges overlap — fix the rows.","err");errBeep();return;}
+    setBusy(true);await onSave(out);setBusy(false);
+  };
+  return(
+    <div>
+      <p style={{color:"var(--tx2)",fontSize:13,marginBottom:14}}>Edit any fee, add new ranges, or remove ones you don't need.</p>
+      <div className="rg-edit-row h"><span>From (₱)</span><span>To (₱)</span><span>Fee (₱)</span><span/></div>
+      <div style={{maxHeight:"46dvh",overflowY:"auto",paddingTop:2}}>
+        {rows.map(r=>(
+          <div key={r.id} className="rg-edit-row">
+            <input type="number" inputMode="decimal" min="0" value={r.min} onKeyDown={blockNumKeys} onChange={e=>set(r.id,"min",e.target.value)} aria-label="From"/>
+            <input type="number" inputMode="decimal" min="0" value={r.max} onKeyDown={blockNumKeys} onChange={e=>set(r.id,"max",e.target.value)} aria-label="To"/>
+            <input type="number" inputMode="decimal" min="0" value={r.fee} onKeyDown={blockNumKeys} onChange={e=>set(r.id,"fee",e.target.value)} aria-label="Fee"/>
+            <button type="button" className="btn bd2 bsm" style={{padding:0,minWidth:40}} aria-label="Remove row" onClick={()=>del(r.id)}><FontAwesomeIcon icon={faTrashCan}/></button>
+          </div>
+        ))}
+      </div>
+      <div style={{display:"flex",gap:8,margin:"10px 0 14px",flexWrap:"wrap"}}>
+        <button type="button" className="btn bg2 bsm" onClick={add}><FontAwesomeIcon icon={faPlus}/> Add rate</button>
+        <button type="button" className="btn bg2 bsm" onClick={()=>setRows(defaultGcashRates().map(r=>({id:r.id,min:String(r.min),max:String(r.max),fee:String(r.fee)})))}>
+          <FontAwesomeIcon icon={faArrowsRotate}/> Reset to default
+        </button>
+      </div>
+      <div style={{display:"flex",gap:10}}>
+        <button className="btn bg2" style={{flex:1}} onClick={onClose} disabled={busy}>Cancel</button>
+        <button className="btn bp" style={{flex:1}} onClick={submit} disabled={busy}><FontAwesomeIcon icon={faFloppyDisk}/> {busy?"Saving…":"Save"}</button>
+      </div>
     </div>
   );
 }
@@ -3175,7 +3400,7 @@ function TxMoreFields({f,s,open,setOpen,refPlaceholder}){
   );
 }
 
-function GCashForm({balances,onSave,onClose}){
+function GCashForm({balances,rates,onSave,onClose}){
   const [f,setF]=useState({type:"cashin",amount:"",fee:"",feeVia:"cash",customer:"",ref:""});
   const [busy,setBusy]=useState(false);
   const [more,setMore]=useState(false);
@@ -3188,6 +3413,8 @@ function GCashForm({balances,onSave,onClose}){
   const afterCash=eff?r2(balances.cash+eff.cash):null;
   const afterGcash=eff?r2(balances.gcash+eff.gcash):null;
   const goesNegative=eff&&(afterCash<0||afterGcash<0);
+  const sugFee=findFee(rates||[],amt);
+  const feeMatches=sugFee!==null&&Number(f.fee)===sugFee&&f.fee!=="";
 
   const submit=async()=>{
     if(lock.current)return;
@@ -3224,6 +3451,13 @@ function GCashForm({balances,onSave,onClose}){
             options={[{v:"cash",l:"Cash"},{v:"gcash",l:"GCash"}]}/>
         </div>
       </div>
+
+      {sugFee!==null&&!feeMatches&&(
+        <div className="rg-sug">
+          <span><FontAwesomeIcon icon={faCircleInfo}/> Guide fee for {fmt(amt)}: <b>{fmt(sugFee)}</b></span>
+          <button type="button" className="btn bp bsm" style={{minHeight:30,padding:"0 12px"}} onClick={()=>s("fee",String(sugFee))}>Use</button>
+        </div>
+      )}
 
       <TxMoreFields f={f} s={s} open={more} setOpen={setMore} refPlaceholder="GCash ref no."/>
 
@@ -3293,6 +3527,17 @@ function GCash({db,saveData,setConfirm}){
   const txns=useMemo(()=>sortNewest(asArr(db.gcashTransactions)),[db.gcashTransactions]);
   const bal=useMemo(()=>gcashBalances(db),[db.gcashTransactions,db.gcashConfig]);
   const cfgSet=!!db.gcashConfig;
+  const rates=useMemo(()=>getRates(db),[db.gcashRates]);
+  const [rateModal,setRateModal]=useState(false);
+
+  const saveRates=async list=>{
+    try{
+      const d=getLS();
+      d.gcashRates=list;
+      await saveData(d);
+      setRateModal(false);toast("Rate guide saved!");okBeep();
+    }catch{toast("Could not save rates!","err");}
+  };
 
   const saveTxn=async t=>{
     try{
@@ -3336,7 +3581,7 @@ function GCash({db,saveData,setConfirm}){
           <div className="msheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
             <div className="shandle"/>
             <h3 style={{fontWeight:700,marginBottom:18,fontSize:16}}><FontAwesomeIcon icon={faWallet} /> New GCash Transaction</h3>
-            <GCashForm balances={bal} onSave={saveTxn} onClose={()=>setNewModal(false)}/>
+            <GCashForm balances={bal} rates={rates} onSave={saveTxn} onClose={()=>setNewModal(false)}/>
           </div>
         </div>
       )}
@@ -3346,6 +3591,15 @@ function GCash({db,saveData,setConfirm}){
             <div className="shandle"/>
             <h3 style={{fontWeight:700,marginBottom:12,fontSize:16}}>Starting Balances</h3>
             <GCashBalForm init={db.gcashConfig||{}} onSave={saveBal} onClose={()=>setBalModal(false)}/>
+          </div>
+        </div>
+      )}
+      {rateModal&&(
+        <div className="backdrop">
+          <div className="msheet mlg" style={{alignSelf:"center",borderRadius:"var(--r)"}}>
+            <div className="shandle"/>
+            <h3 style={{fontWeight:700,marginBottom:12,fontSize:16}}><FontAwesomeIcon icon={faFileLines} /> Edit Rate Charge Guide</h3>
+            <GCashRateEditor rates={rates} onSave={saveRates} onClose={()=>setRateModal(false)}/>
           </div>
         </div>
       )}
@@ -3386,10 +3640,14 @@ function GCash({db,saveData,setConfirm}){
             )}
 
             <div className="rpt-stats gx-stats">
-              <StatCard label="Cash on Hand" value={fmtS(bal.cash)} color="var(--ac)"/>
-              <StatCard label="GCash Wallet Balance" value={fmtS(bal.gcash)} color="var(--in)"/>
-              <StatCard label="Total (Cash + GCash)" value={fmtS(bal.total)} color="#8e44ad"/>
-              <StatCard label="Total Profit" value={fmt(bal.profit)} color="var(--wn)" sub={`Today: ${fmt(bal.todayProfit)}`}/>
+              <StatCard icon={faHandHoldingDollar} label="Cash on Hand" value={fmtS(bal.cash)} color="var(--ac)"/>
+              <StatCard icon={faWallet} label="GCash Wallet Balance" value={fmtS(bal.gcash)} color="var(--in)"/>
+              <StatCard icon={faSquarePlus} label="Total (Cash + GCash)" value={fmtS(bal.total)} color="#8e44ad"/>
+              <StatCard icon={faChartLine} label="Total Profit" value={fmt(bal.profit)} color="var(--wn)" sub={`Today: ${fmt(bal.todayProfit)}`}/>
+            </div>
+
+            <div className="gx-pad">
+              <GCashRateGuide rates={rates} onEdit={()=>setRateModal(true)}/>
             </div>
 
             <div className="gx-pad" style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:10}}>
