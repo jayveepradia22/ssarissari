@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { auth, db as rtdb } from "./firebaseConfig";
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, deleteUser, signOut } from "firebase/auth";
@@ -342,13 +343,71 @@ input[type=checkbox]{
   from{transform:translateX(-50%) translateY(-12px);opacity:0}
   to{transform:translateX(-50%) translateY(0);opacity:1}}
 
+/* ─── DRAGGABLE CATEGORY BAR ────────────────────────────── */
+.dscroll{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;touch-action:pan-x;
+  cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.dscroll::-webkit-scrollbar{display:none;width:0;height:0}
+.dscroll.dragging{cursor:grabbing}
+.dscroll.dragging .btn{pointer-events:none}
+.dscroll .btn{cursor:pointer}
+.dscroll.dragging .btn{cursor:grabbing}
+
+/* ─── CATEGORY PICKER ───────────────────────────────────── */
+.cp-trigger{
+  display:flex;align-items:center;gap:10px;width:100%;min-height:44px;text-align:left;
+  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);
+  padding:10px 14px;color:var(--tx);font-size:14px;transition:border .18s,box-shadow .18s}
+.cp-trigger.open,.cp-trigger:focus-visible{border-color:var(--ac);box-shadow:0 0 0 3px var(--acl);outline:none}
+.cp-trigger .cp-emo{font-size:18px;line-height:1;flex-shrink:0}
+.cp-trigger .cp-val{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp-trigger .cp-ph{color:var(--tx3)}
+.cp-trigger .cp-chev{color:var(--tx3);font-size:12px;transition:transform .2s}
+.cp-trigger.open .cp-chev{transform:rotate(180deg)}
+.cp-backdrop{z-index:2100!important}
+.cp-sheet{padding-top:14px!important;max-width:480px;display:flex;flex-direction:column}
+.cp-head{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 12px}
+.cp-title{font-weight:700;font-size:15px;color:var(--tx)}
+.cp-x{width:32px;height:32px;border-radius:50%;background:var(--sf2);color:var(--tx2);
+  display:flex;align-items:center;justify-content:center;font-size:13px}
+.cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;
+  padding:2px;margin:-2px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.cp-opt{
+  display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 12px;
+  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);
+  color:var(--tx);font-size:13.5px;font-weight:500;text-align:left;min-width:0}
+.cp-opt .cp-emo{font-size:20px;line-height:1;flex-shrink:0}
+.cp-opt .cp-lbl{min-width:0;line-height:1.25}
+.cp-opt:hover{background:var(--sf2)}
+.cp-opt.on{border-color:var(--ac);background:var(--acl);color:var(--ac);font-weight:600}
+@media(max-width:768px){.cp-sheet{max-width:none}.cp-grid{max-height:60dvh}}
+
 /* ─── PRODUCT CARDS ─────────────────────────────────────── */
 .pcard{
   background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);
-  padding:12px;cursor:pointer;transition:all .18s;
-  text-align:center;user-select:none;min-height:44px}
+  padding:12px 8px;cursor:pointer;transition:all .18s;
+  text-align:center;user-select:none;min-height:112px;height:auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  box-sizing:border-box;min-width:0;overflow:hidden}
+.pcard .pc-name{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;word-break:break-word;width:100%;line-height:1.3;
+  min-height:calc(1.3em*2)}
+.pos-products{grid-auto-rows:max-content}
 .pcard:hover{border-color:var(--ac);background:var(--acl);transform:translateY(-1px)}
 .pcard:active{transform:scale(.97)}
+
+/* ─── INVENTORY CARDS: a little larger on desktop only ───── */
+@media(min-width:769px){
+  .inv-grid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))!important;gap:8px!important}
+  .ic-card{padding:12px 14px!important;gap:12px!important}
+  .ic-ico{width:44px!important;height:44px!important;border-radius:10px!important;font-size:23px!important}
+  .ic-name{font-size:15px!important}
+  .ic-price{font-size:15px!important}
+  .ic-badge{font-size:12px!important;padding:2px 10px!important}
+  .ic-menu{width:34px!important;height:34px!important;font-size:18px!important}
+}
 
 /* ─── TABLES ────────────────────────────────────────────── */
 .twrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r)}
@@ -515,8 +574,16 @@ tr:hover td{background:var(--sf2)}
 .mob-only{display:none}
 @media(max-width:768px){
   .gx-wrap{padding:0}
-  .gx-pad{padding:0 16px}
+  .gx-pad{padding:0 14px}
+  .gx-bleed{padding:0}
   .gx-stats{grid-template-columns:repeat(2,1fr)}
+  .gx-stats.rpt-stats{padding:0!important;gap:1px!important;margin-bottom:1px}
+  .gx-stats.rpt-stats .sc{border-radius:0!important;border:none!important;box-shadow:none!important;padding:11px 14px!important;margin:0!important}
+  .gx-stats .sc{gap:10px!important}
+  .gx-stats .sc>span{width:34px!important;height:34px!important;border-radius:9px!important;font-size:16px!important}
+  .gx-stats .sl{margin-top:0}
+  .gx-banner{border-radius:0!important;border-left:none!important;border-right:none!important;margin-bottom:1px!important}
+  .gx-bleed .rg-card{border-radius:0;border-left:none;border-right:none;margin-bottom:8px}
   .gx-list{gap:1px}
   .gx-row{border-radius:0;border-left:none;border-right:none}
   .mob-only{display:block}
@@ -671,7 +738,7 @@ const CAT_EMOJI=cat=>({
   "Instant Noodles":"🍜","Drinks":"🥤","Cigarettes":"🚬","Biscuits":"🍪",
   "Vegetables":"🥬","Condiments":"🧂","Snacks":"🍟","Canned Goods":"🥫",
   "Hygiene":"🧼","Dairy":"🥛","Rice & Grains":"🌾","Frozen Foods":"🧊",
-  "Candies":"🍬","Bread":"🍞","Cooking Oil":"🫙","Coffee & Tea":"☕","Others":"📦"
+  "Candies":"🍬","Bread":"🍞","Cooking Oil":"🍳","Coffee & Tea":"☕","Others":"📦"
 })[cat]||"📦";
 
 const ALL_CATS=["Instant Noodles","Drinks","Cigarettes","Biscuits","Vegetables",
@@ -1123,7 +1190,7 @@ export default function App(){
         <div style={{textAlign:"center",marginBottom:28}}>
           <div style={{width:70,height:70,background:"var(--acl)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px",fontSize:34}}>🏪</div>
           <h1 style={{fontSize:22,fontWeight:800,marginBottom:4}}>{reg?"Register Your Store":"Store Management System"}</h1>
-          <p style={{color:"var(--tx2)",fontSize:13,fontWeight:500}}>{reg?"Create your store account":"Log in to your store"}</p>
+          {reg&&<p style={{color:"var(--tx2)",fontSize:13,fontWeight:500}}>Create your store account</p>}
         </div>
         {!reg&&loginF.err&&<div style={{background:"var(--dnl)",color:"var(--dn)",borderRadius:"var(--rs)",padding:"9px 14px",marginBottom:14,fontSize:13,fontWeight:500}}>❌ {loginF.err}</div>}
         {reg&&regF.err&&<div style={{background:"var(--dnl)",color:"var(--dn)",borderRadius:"var(--rs)",padding:"9px 14px",marginBottom:14,fontSize:13,fontWeight:500}}>❌ {regF.err}</div>}
@@ -1402,14 +1469,14 @@ function Dashboard({db,setPage}){
     <div className="pg-page">
       {/* Header */}
       <div className="pg-hdr">
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
-          <div>
-            <h2 style={{fontSize:19,fontWeight:800,lineHeight:1.3}}>{greet}{ownerFirst?`, ${ownerFirst}`:""}</h2>
-            <p style={{color:"var(--tx2)",fontSize:12,marginTop:2}}>
-              {new Date().toLocaleDateString("en-PH",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"nowrap",gap:10}}>
+          <div style={{flex:1,minWidth:0}}>
+            <h2 style={{fontSize:"clamp(14px,4.2vw,17px)",fontWeight:800,lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{greet}{ownerFirst?`, ${ownerFirst}`:""}</h2>
+            <p style={{color:"var(--tx2)",fontSize:"clamp(10px,2.8vw,12px)",marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+              {new Date().toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric",year:"numeric"})}
             </p>
           </div>
-          <button className="btn bp bsm" onClick={()=>setPage("pos")}><FontAwesomeIcon icon={faCartShopping} /> New Sale</button>
+          <button className="btn bp bsm" style={{flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>setPage("pos")}><FontAwesomeIcon icon={faCartShopping} /> New Sale</button>
         </div>
       </div>
 
@@ -1829,9 +1896,9 @@ function POS({db,saveData,setConfirm}){
       {/* POS page: header pinned, body scrolls beneath */}
       <div className="pg-hdr">
         <SearchBar value={search} onChange={setSearch} placeholder="Search product…"/>
-        <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:4,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
+        <DragScroll style={{paddingBottom:4,marginTop:10}}>
           {cats.map(c=><button key={c} className={`btn bsm ${catFilter===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatFilter(c)}>{c}</button>)}
-        </div>
+        </DragScroll>
       </div>
 
       <div className="pg-body pos-body">
@@ -1839,8 +1906,8 @@ function POS({db,saveData,setConfirm}){
           <div className="pos-products" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(115px,1fr))",gap:10}}>
             {filtered.map(p=>(
               <div key={p.id} className="pcard" style={{opacity:p.stock<=0?.45:1}} onClick={()=>handleProdClick(p)}>
-                <div style={{fontSize:28,marginBottom:6}}>{CAT_EMOJI(p.category)}</div>
-                <div style={{fontSize:12,fontWeight:700,lineHeight:1.3,marginBottom:3}}>{p.name}</div>
+                <div style={{fontSize:28,lineHeight:1.2,marginBottom:6,flexShrink:0}}>{CAT_EMOJI(p.category)}</div>
+                <div className="pc-name" style={{fontSize:12,fontWeight:700,marginBottom:3}} title={p.name}>{p.name}</div>
                 <div style={{fontSize:13,color:"var(--ac)",fontWeight:800}}>{p.isOpenPrice?"Open Price":fmt(p.price)}</div>
                 <div style={{fontSize:11,color:p.stock<=5?"var(--wn)":"var(--tx3)",marginTop:2}}>{p.stock} left</div>
               </div>
@@ -1901,6 +1968,76 @@ function ReceiptModal({data,onClose}){
   );
 }
 
+/* Horizontally draggable strip: mouse drag (with momentum) on desktop,
+   native touch swipe on mobile. Scrollbar hidden; clicks on children still work. */
+function DragScroll({children,style,className=""}){
+  const ref=useRef(null);
+  const st=useRef({down:false,moved:false,startX:0,startLeft:0,lastX:0,lastT:0,v:0,raf:0});
+
+  useEffect(()=>{
+    const el=ref.current;if(!el)return;
+    /* vertical mouse wheel scrolls the bar sideways */
+    const onWheel=e=>{
+      if(el.scrollWidth<=el.clientWidth||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+      e.preventDefault();el.scrollLeft+=e.deltaY;
+    };
+    el.addEventListener("wheel",onWheel,{passive:false});
+    return()=>{el.removeEventListener("wheel",onWheel);cancelAnimationFrame(st.current.raf);};
+  },[]);
+
+  const onPointerDown=e=>{
+    if(e.pointerType!=="mouse"||e.button!==0)return; /* touch uses native scrolling */
+    const el=ref.current,d=st.current;
+    cancelAnimationFrame(d.raf);
+    d.down=true;d.moved=false;d.startX=e.clientX;d.startLeft=el.scrollLeft;
+    d.lastX=e.clientX;d.lastT=performance.now();d.v=0;
+  };
+  const onPointerMove=e=>{
+    const d=st.current,el=ref.current;
+    if(!d.down||e.pointerType!=="mouse")return;
+    const dx=e.clientX-d.startX;
+    if(!d.moved){
+      if(Math.abs(dx)<5)return;
+      d.moved=true;el.classList.add("dragging");
+      try{el.setPointerCapture(e.pointerId);}catch{}
+    }
+    el.scrollLeft=d.startLeft-dx;
+    const now=performance.now(),dt=now-d.lastT;
+    if(dt>0){d.v=.8*d.v+.2*((d.lastX-e.clientX)/dt);} /* px per ms */
+    d.lastX=e.clientX;d.lastT=now;
+  };
+  const endDrag=e=>{
+    const d=st.current,el=ref.current;
+    if(!d.down)return;
+    d.down=false;
+    if(!d.moved)return;
+    el.classList.remove("dragging");
+    try{el.releasePointerCapture(e.pointerId);}catch{}
+    /* momentum */
+    let v=d.v*16; /* px per frame */
+    if(performance.now()-d.lastT>80)v=0;
+    const step=()=>{
+      if(Math.abs(v)<.4)return;
+      el.scrollLeft+=v;v*=.94;
+      d.raf=requestAnimationFrame(step);
+    };
+    d.raf=requestAnimationFrame(step);
+  };
+  /* swallow the click that ends a drag so a category isn't selected by accident */
+  const onClickCapture=e=>{
+    if(st.current.moved){e.preventDefault();e.stopPropagation();st.current.moved=false;}
+  };
+
+  return(
+    <div ref={ref} className={`dscroll ${className}`} style={style}
+      onPointerDown={onPointerDown} onPointerMove={onPointerMove}
+      onPointerUp={endDrag} onPointerCancel={endDrag}
+      onClickCapture={onClickCapture} onDragStart={e=>e.preventDefault()}>
+      {children}
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════
    INVENTORY
 ═══════════════════════════════════════════ */
@@ -1918,6 +2055,7 @@ function Inventory({db,saveData,setConfirm}){
 
   const handleSave=async(form,isNew)=>{
     if(!form.name?.trim()){toast("Product name required!","err");return;}
+    if(!form.category){toast("Please select a category!","err");return;}
     if(!form.isOpenPrice&&(form.price===""||isNaN(parseFloat(form.price)))){toast("Enter a valid price!","err");return;}
     if(form.stock===""||isNaN(parseInt(form.stock))){toast("Enter stock quantity!","err");return;}
     const clean={...form,name:sanitize(form.name.trim()),price:parseFloat(form.price)||0,stock:parseInt(form.stock)||0};
@@ -1945,24 +2083,24 @@ function Inventory({db,saveData,setConfirm}){
 
   return(
     <div style={{display:"contents"}}>
-      {modal&&<ProdModal product={editP} onSave={handleSave} onClose={()=>{setModal(false);setEditP(null);}}/>}
+      {modal&&<ProdModal product={editP} defaultCategory={catF==="All"?"":catF} extraCats={usedCats.filter(c=>c!=="All"&&!ALL_CATS.includes(c))} onSave={handleSave} onClose={()=>{setModal(false);setEditP(null);}}/>}
 
       <div className="pg-page">
-        <div className="pg-act">
-          <button className="btn bp bsm" onClick={()=>{setEditP(null);setModal(true);}}>+ Add Product</button>
-        </div>
         <div className="pg-hdr">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search products…"/>
-          <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2,marginTop:10,WebkitOverflowScrolling:"touch",scrollbarWidth:"none",msOverflowStyle:"none"}}>
-            {usedCats.map(c=><button key={c} className={`btn bsm ${catF===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatF(c)}>{c}</button>)}
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <SearchBar value={search} onChange={setSearch} placeholder="Search products…"/>
+            <button className="btn bp bsm" style={{flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>{setEditP(null);setModal(true);}}>+ Add Product</button>
           </div>
+          <DragScroll style={{paddingBottom:2,marginTop:10}}>
+            {usedCats.map(c=><button key={c} className={`btn bsm ${catF===c?"bp":"bg2"}`} style={{flexShrink:0}} onClick={()=>setCatF(c)}>{c}</button>)}
+          </DragScroll>
         </div>
 
         <div className="pg-body">
           {filtered.length===0&&(
             <div className="card" style={{padding:32,textAlign:"center",color:"var(--tx3)"}}>No products found.</div>
           )}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:2}}>
+          <div className="inv-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:2}}>
             {filtered.map(p=>{
               const thresh=db.settings?.lowStockThreshold||5;
               const isOut=p.stock<=0;
@@ -1993,25 +2131,25 @@ function InventoryCard({p,stockColor,stockBg,stockLabel,onEdit,onDelete}){
     return()=>{document.removeEventListener("mousedown",h);document.removeEventListener("touchstart",h);};
   },[menuOpen]);
   return(
-    <div className="card" style={{padding:"16px 18px",display:"flex",alignItems:"center",gap:5,position:"relative"}}>
-      <div style={{width:46,height:46,borderRadius:12,background:"var(--sf2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,flexShrink:0}}>
+    <div className="card ic-card" style={{padding:"7px 10px",display:"flex",alignItems:"center",gap:8,position:"relative"}}>
+      <div className="ic-ico" style={{width:32,height:32,borderRadius:8,background:"var(--sf2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>
         {CAT_EMOJI(p.category)}
       </div>
       <div style={{flex:1,minWidth:0}}>
-        <div style={{fontWeight:700,fontSize:15,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
+        <div className="ic-name" style={{fontWeight:700,fontSize:13,lineHeight:1.25,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.name}</div>
         {p.isOpenPrice&&(
-          <div style={{marginTop:4}}>
-            <span className="badge bg-b" style={{fontSize:11}}>Open Price</span>
+          <div style={{marginTop:2}}>
+            <span className="badge bg-b" style={{fontSize:10,padding:"1px 7px"}}>Open Price</span>
           </div>
         )}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:8}}>
-          <span style={{fontWeight:800,fontSize:16,color:"var(--tx)"}}>{p.isOpenPrice?"Variable":fmt(p.price)}</span>
-          <span style={{padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:800,background:stockBg,color:stockColor}}>{stockLabel}</span>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:6,marginTop:2}}>
+          <span className="ic-price" style={{fontWeight:800,fontSize:13,color:"var(--tx)"}}>{p.isOpenPrice?"Variable":fmt(p.price)}</span>
+          <span className="ic-badge" style={{padding:"1px 7px",borderRadius:20,fontSize:10,fontWeight:800,whiteSpace:"nowrap",background:stockBg,color:stockColor}}>{stockLabel}</span>
         </div>
       </div>
       {/* Three-dot menu */}
       <div ref={ref} style={{position:"relative",flexShrink:0}}>
-        <button style={{width:32,height:32,borderRadius:8,border:"1.5px solid var(--bd)",background:"var(--sf2)",color:"var(--tx2)",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}
+        <button className="ic-menu" style={{width:28,height:28,borderRadius:7,border:"1px solid var(--bd)",background:"var(--sf2)",color:"var(--tx2)",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}
           onClick={()=>setMenuOpen(o=>!o)}>⋮</button>
         {menuOpen&&(
           <div style={{position:"absolute",right:0,top:"calc(100% + 6px)",background:"var(--sf)",border:"1.5px solid var(--bd)",borderRadius:10,boxShadow:"var(--shlg)",zIndex:200,minWidth:130,overflow:"hidden"}}>
@@ -2030,9 +2168,52 @@ function InventoryCard({p,stockColor,stockBg,stockLabel,onEdit,onDelete}){
   );
 }
 
-function ProdModal({product,onSave,onClose}){
+/* Clean, minimal category picker: input-style trigger + bottom sheet of tiles
+   (replaces the native <select>, which renders a clunky OS list on mobile). */
+function CategoryPicker({value,onChange,options}){
+  const [open,setOpen]=useState(false);
+  useEffect(()=>{
+    if(!open)return;
+    const onKey=e=>{if(e.key==="Escape")setOpen(false);};
+    document.addEventListener("keydown",onKey);
+    return()=>document.removeEventListener("keydown",onKey);
+  },[open]);
+  const pick=c=>{onChange(c);setOpen(false);};
+  return(
+    <>
+      <button type="button" className={`cp-trigger ${open?"open":""}`} onClick={()=>setOpen(true)}>
+        {value
+          ?<><span className="cp-emo">{CAT_EMOJI(value)}</span><span className="cp-val">{value}</span></>
+          :<span className="cp-val cp-ph">Select category…</span>}
+        <FontAwesomeIcon icon={faChevronDown} className="cp-chev"/>
+      </button>
+      {open&&createPortal(
+        <div className="backdrop cp-backdrop" onClick={e=>e.target===e.currentTarget&&setOpen(false)}>
+          <div className="msheet cp-sheet">
+            <div className="shandle" style={{marginBottom:12}}/>
+            <div className="cp-head">
+              <div className="cp-title">Select Category</div>
+              <button type="button" className="cp-x" onClick={()=>setOpen(false)} aria-label="Close">
+                <FontAwesomeIcon icon={faXmark}/>
+              </button>
+            </div>
+            <div className="cp-grid">
+              {options.map(c=>(
+                <button type="button" key={c} className={`cp-opt ${value===c?"on":""}`} onClick={()=>pick(c)}>
+                  <span className="cp-emo">{CAT_EMOJI(c)}</span>
+                  <span className="cp-lbl">{c}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>,document.body)}
+    </>
+  );
+}
+
+function ProdModal({product,onSave,onClose,defaultCategory="",extraCats=[]}){
   const isNew=!product;
-  const [form,setForm]=useState(isNew?{name:"",category:ALL_CATS[0],price:"",stock:"",isOpenPrice:false}:{...product});
+  const [form,setForm]=useState(isNew?{name:"",category:defaultCategory||"",price:"",stock:"",isOpenPrice:false}:{...product});
   const s=(k,v)=>setForm(p=>({...p,[k]:v}));
   return(
     <div className="backdrop">
@@ -2045,9 +2226,7 @@ function ProdModal({product,onSave,onClose}){
             onChange={e=>s("name",e.target.value)} autoFocus maxLength={200}/>
         </div>
         <div className="fg"><label>Category *</label>
-          <select value={form.category} onChange={e=>s("category",e.target.value)}>
-            {ALL_CATS.map(c=><option key={c} value={c}>{CAT_EMOJI(c)} {c}</option>)}
-          </select>
+          <CategoryPicker value={form.category||""} onChange={v=>s("category",v)} options={[...ALL_CATS,...extraCats]}/>
         </div>
         <div style={{background:"var(--sf2)",borderRadius:"var(--rs)",padding:14,marginBottom:16,display:"flex",gap:12,alignItems:"flex-start"}}>
           <input type="checkbox" id="opx" checked={form.isOpenPrice} onChange={e=>s("isOpenPrice",e.target.checked)} style={{marginTop:2}}/>
@@ -2247,20 +2426,25 @@ function Utang({db,saveData,setConfirm}){
 
       {/* Utang page: header pinned, list scrolls beneath */}
       <div className="pg-page">
-        <div className="pg-act">
-          <button className="btn bp bsm" onClick={()=>{setEditCust(null);setCustModal(true);}}>+ Add Customer</button>
-        </div>
         <div className="pg-hdr">
-          {/* Total utang summary inside header */}
-          <div style={{background:"var(--wnl)",border:"1.5px solid var(--wn)",borderRadius:"var(--rs)",padding:"10px 14px",marginBottom:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div>
-              <div style={{fontSize:11,color:"var(--tx2)",fontWeight:500}}>Total Uncollected Utang</div>
-              <div style={{fontSize:20,fontWeight:800,color:"var(--wn)"}}>{fmt(totalUtang)}</div>
-              <div style={{fontSize:11,color:"var(--tx3)"}}>{customers.filter(c=>c.balance>0).length} with balance</div>
+          {/* Summary: icon tile, total owed, and how many customers still owe */}
+          <div style={{background:"var(--wnl)",border:"1.5px solid var(--wn)",borderRadius:"var(--rs)",padding:"9px 12px",marginBottom:10,display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:34,height:34,borderRadius:9,background:"var(--sf)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>💳</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:11,color:"var(--tx2)",fontWeight:500,lineHeight:1.2}}>Total Uncollected Utang</div>
+              <div style={{fontSize:20,fontWeight:800,color:"var(--wn)",lineHeight:1.2}}>{fmt(totalUtang)}</div>
             </div>
-            <span style={{fontSize:28}}>💳</span>
+            <div style={{textAlign:"right",flexShrink:0}}>
+              <div style={{fontSize:16,fontWeight:800,color:"var(--tx)",lineHeight:1.2}}>{customers.filter(c=>c.balance>0).length}</div>
+              <div style={{fontSize:10,color:"var(--tx3)",lineHeight:1.2}}>with balance</div>
+            </div>
           </div>
-          <SearchBar value={search} onChange={setSearch} placeholder="Search by name, contact, or address…"/>
+          {/* Search + Add on one row (same pattern as the Products page) */}
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <SearchBar value={search} onChange={setSearch} placeholder="Search customers…"/>
+            <button className="btn bp bsm" style={{flexShrink:0,whiteSpace:"nowrap"}} aria-label="Add customer"
+              onClick={()=>{setEditCust(null);setCustModal(true);}}>+ Add</button>
+          </div>
         </div>
 
         {/* Customer list — scrollable */}
@@ -2601,6 +2785,7 @@ function ProfileMenu({db,page,setPage,logout}){
 ═══════════════════════════════════════════ */
 function ProfilePage({db,saveData,logout,page,setPage}){
   const [form,setForm]=useState({
+    ownerName:cleanName(db.settings.ownerName||db.profile?.ownerName||auth.currentUser?.displayName||"",60),
     storeName:db.settings.storeName||"",
     address:db.settings.address||"",
     contact:db.settings.contact||"",
@@ -2617,7 +2802,10 @@ function ProfilePage({db,saveData,logout,page,setPage}){
     const d=getLS();
     d.settings={...d.settings,address:form.address,contact:form.contact,lowStockThreshold:form.lowStockThreshold};
     d.settings.storeName=cleanName(form.storeName)||d.profile?.storeName||"My Store";
-    d.profile={...(d.profile||{}),storeName:d.settings.storeName};
+    const owner=cleanName(form.ownerName,60);
+    if(!owner){toast("Owner name is required!","err");errBeep();return;}
+    d.settings.ownerName=owner;
+    d.profile={...(d.profile||{}),storeName:d.settings.storeName,ownerName:owner};
     await saveData(d);toast("Profile saved! ✅");
   };
 
@@ -2632,7 +2820,10 @@ function ProfilePage({db,saveData,logout,page,setPage}){
             <h3 style={{fontWeight:700,fontSize:15}}><FontAwesomeIcon icon={faStore}/> Store profile</h3>
             <p style={{color:"var(--tx2)",fontSize:13,margin:"2px 0 16px"}}>This is how your store shows up on receipts and across the app.</p>
             <div className="frow">
+              <div className="fg"><label>Owner Name</label><input value={form.ownerName} maxLength={60} placeholder="Your name" onChange={e=>s("ownerName",e.target.value)}/></div>
               <div className="fg"><label>Store Name</label><input value={form.storeName} onChange={e=>s("storeName",e.target.value)}/></div>
+            </div>
+            <div className="frow">
               <div className="fg"><label>Contact Number</label>
                 <input type="text" inputMode="numeric" value={form.contact} maxLength={11}
                   onChange={e=>s("contact",e.target.value.replace(/[^0-9]/g,"").slice(0,11))}/>
@@ -2640,14 +2831,12 @@ function ProfilePage({db,saveData,logout,page,setPage}){
                   <div style={{fontSize:12,color:"var(--dn)",marginTop:5}}>Must be exactly 11 digits.</div>
                 )}
               </div>
-            </div>
-            <div className="frow">
               <div className="fg"><label>Address</label><input value={form.address} onChange={e=>s("address",e.target.value)}/></div>
-              <div className="fg">
-                <label>Low Stock Alert Threshold</label>
-                <input type="number" min="1" value={form.lowStockThreshold} onChange={e=>s("lowStockThreshold",parseInt(e.target.value)||5)}/>
-                <div style={{fontSize:12,color:"var(--tx2)",marginTop:5}}>Alert when stock falls to or below this number.</div>
-              </div>
+            </div>
+            <div className="fg">
+              <label>Low Stock Alert Threshold</label>
+              <input type="number" min="1" value={form.lowStockThreshold} onChange={e=>s("lowStockThreshold",parseInt(e.target.value)||5)}/>
+              <div style={{fontSize:12,color:"var(--tx2)",marginTop:5}}>Alert when stock falls to or below this number.</div>
             </div>
             <button className="btn bp" onClick={save}><FontAwesomeIcon icon={faFloppyDisk}/> Save changes</button>
           </div>
@@ -2982,7 +3171,7 @@ const GUIDE_SECTIONS=[
     tip:"Not sure of the price yet? Turn on Open / Variable Price and enter it at the time of sale. Set your low-stock alert level in Profile."},
   {id:"utang",icon:faClipboardList,title:"Utang",blurb:"Track what customers owe and their payments.",page:"utang",pageLabel:"Open Utang",
     steps:[
-      "Tap + Add Customer and save their name, contact, and address.",
+      "Tap + Add (beside the search bar) and save their name, contact, and address.",
       "To sell on credit, choose Utang in Point of Sale and pick the customer.",
       "When they pay, open the customer, tap Payment, enter the amount, and confirm. Partial payments are fine.",
       "Tap Ledger to see every utang and payment for that customer."
@@ -3624,17 +3813,21 @@ function GCash({db,saveData,setConfirm}){
       )}
 
       <div className="pg-page">
-        <div className="pg-act">
-          <button className="btn bp bsm" onClick={()=>setNewModal(true)}>+ New Transaction</button>
+        <div className="pg-hdr" style={{padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+          <div style={{minWidth:0}}>
+            <div style={{fontSize:10,color:"var(--tx3)",fontWeight:500,lineHeight:1.2}}>Today's Profit</div>
+            <div style={{fontSize:15,fontWeight:800,color:"var(--ac)",lineHeight:1.2}}>{fmt(bal.todayProfit)}</div>
+          </div>
+          <button className="btn bp bsm" style={{flexShrink:0,minHeight:34,padding:"0 14px",fontSize:13}} onClick={()=>setNewModal(true)}>+ New Transaction</button>
         </div>
         <div className="pg-body">
           <div className="gx-wrap">
             {!cfgSet&&(
-              <div className="gx-pad">
-                <div style={{background:"var(--inl)",border:"1.5px solid var(--in)",borderRadius:"var(--rs)",padding:14,marginBottom:12,fontSize:13,color:"var(--in)",
-                  display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,flexWrap:"wrap"}}>
-                  <span>Set your starting Cash on Hand and GCash Wallet balance first.</span>
-                  <button className="btn bg2 bsm" onClick={()=>setBalModal(true)}>Set Balances</button>
+              <div className="gx-bleed">
+                <div className="gx-banner" style={{background:"var(--inl)",border:"1.5px solid var(--in)",borderRadius:"var(--rs)",padding:"8px 14px",marginBottom:10,fontSize:12,lineHeight:1.3,color:"var(--in)",
+                  display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+                  <span style={{flex:1,minWidth:0}}>Set your starting Cash on Hand and GCash balance first.</span>
+                  <button className="btn bg2 bsm" style={{flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>setBalModal(true)}>Set Balances</button>
                 </div>
               </div>
             )}
@@ -3646,7 +3839,7 @@ function GCash({db,saveData,setConfirm}){
               <StatCard icon={faChartLine} label="Total Profit" value={fmt(bal.profit)} color="var(--wn)" sub={`Today: ${fmt(bal.todayProfit)}`}/>
             </div>
 
-            <div className="gx-pad">
+            <div className="gx-bleed">
               <GCashRateGuide rates={rates} onEdit={()=>setRateModal(true)}/>
             </div>
 
@@ -3827,8 +4020,12 @@ function ELoad({db,saveData,setConfirm}){
       )}
 
       <div className="pg-page">
-        <div className="pg-act">
-          <button className="btn bp bsm" onClick={()=>setNewModal(true)}>+ New Transaction</button>
+        <div className="pg-hdr" style={{padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+          <div style={{minWidth:0}}>
+            <div style={{fontSize:10,color:"var(--tx3)",fontWeight:500,lineHeight:1.2}}>Today's Profit</div>
+            <div style={{fontSize:15,fontWeight:800,color:"var(--ac)",lineHeight:1.2}}>{fmt(totals.tProfit)}</div>
+          </div>
+          <button className="btn bp bsm" style={{flexShrink:0,minHeight:34,padding:"0 14px",fontSize:13}} onClick={()=>setNewModal(true)}>+ New Transaction</button>
         </div>
         <div className="pg-body">
           <div className="gx-wrap">
