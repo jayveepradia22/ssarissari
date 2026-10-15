@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { auth, db as rtdb } from "./firebaseConfig";
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, deleteUser, signOut } from "firebase/auth";
 import { ref as dbRef, get as dbGet, set as dbSet, onValue } from "firebase/database";
-import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash,faDownload,faWallet,faMobileScreenButton,faCircleQuestion,faEnvelope,faPaperPlane,faEllipsis,faCircleUser,faChevronDown,faBookOpen,faCalendarDay,faCalendarWeek,faCalendarDays,faInfinity,faFileLines,faSquarePlus,faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import { faHouse,faBoxesStacked,faClipboardList,faGear,faArrowsRotate,faCloudArrowUp,faLightbulb,faSkullCrossbones,faFileExport,faLockOpen,faXmark,faCartShopping,faPlus,faChartLine,faFilePen,faHandHoldingDollar,faFloppyDisk,faPen,faTrashCan,faStore,faLock,faTriangleExclamation,faRightFromBracket,faPrint,faMagnifyingGlass,faEye,faEyeSlash,faDownload,faWallet,faMobileScreenButton,faCircleQuestion,faEnvelope,faPaperPlane,faEllipsis,faCircleUser,faChevronDown,faBookOpen,faCalendarDay,faCalendarWeek,faCalendarDays,faInfinity,faFileLines,faSquarePlus,faCircleInfo,faTags} from "@fortawesome/free-solid-svg-icons";
 
 /* ── FONT ── */
 {
@@ -290,6 +290,16 @@ input[type=checkbox]{
   padding:24px 20px max(24px,env(safe-area-inset-bottom))}
 @media(min-width:600px){.msheet{border-radius:var(--r);max-height:88dvh;padding:28px}}
 .mlg{max-width:680px}
+
+/* Add/Edit Product dialog: compact so the action buttons always fit on screen, no scrolling */
+.prod-sheet{padding:12px 16px max(14px,env(safe-area-inset-bottom))!important;max-height:100dvh}
+.prod-sheet .shandle{margin-bottom:10px}
+.prod-sheet .fg{margin-bottom:10px}
+.prod-sheet .fg label{margin-bottom:4px;font-size:12.5px}
+.prod-sheet input:not([type=checkbox]){min-height:42px;padding:8px 12px}
+.prod-sheet .cp-trigger{min-height:42px;padding:8px 12px}
+.prod-sheet .btn{min-height:44px}
+@media(min-width:600px){.prod-sheet{padding:20px 22px!important}}
 @keyframes shUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 .shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 16px}
 
@@ -382,6 +392,35 @@ input[type=checkbox]{
 .cp-opt:hover{background:var(--sf2)}
 .cp-opt.on{border-color:var(--ac);background:var(--acl);color:var(--ac);font-weight:600}
 @media(max-width:768px){.cp-sheet{max-width:none}.cp-grid{max-height:60dvh}}
+.cp-mng{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:16px;
+  background:var(--sf2);color:var(--tx2);font-size:12.5px;font-weight:600}
+.cp-mng:hover{color:var(--ac);background:var(--acl)}
+
+/* ─── CATEGORY MANAGER ──────────────────────────────────── */
+.cm-backdrop{z-index:2200!important}
+.cm-form{background:var(--sf2);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.cm-form .cm-row{display:flex;gap:8px;align-items:center}
+.cm-emoji-in{width:54px!important;flex:0 0 54px;text-align:center;font-size:20px;padding:8px 4px!important}
+.cm-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.cm-chip{width:34px;height:34px;border-radius:8px;font-size:18px;line-height:1;
+  display:flex;align-items:center;justify-content:center;background:var(--sf);border:1.5px solid transparent}
+.cm-chip:hover{background:var(--acl)}
+.cm-chip.on{border-color:var(--ac);background:var(--acl)}
+.cm-list{overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:2px;margin:-2px;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;max-height:46dvh}
+.cm-item{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 8px 8px 12px;
+  background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs)}
+.cm-item.editing{border-color:var(--ac);background:var(--acl)}
+.cm-item .cm-emo{font-size:21px;line-height:1;flex-shrink:0}
+.cm-item .cm-name{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--tx);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-item .cm-cnt{font-size:11.5px;font-weight:500;color:var(--tx3);margin-left:6px}
+.cm-ib{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:var(--tx2);font-size:13px;flex-shrink:0}
+.cm-ib:hover{background:var(--sf2);color:var(--ac)}
+.cm-ib.dn:hover{color:var(--dn);background:var(--dnl)}
+.cm-del{flex:1;font-size:12.5px;line-height:1.35;color:var(--tx)}
+@media(max-width:768px){.cm-list{max-height:40dvh}}
 
 /* ─── PRODUCT CARDS ─────────────────────────────────────── */
 .pcard{
@@ -734,16 +773,38 @@ const beep=(f=880,d=80,t="square")=>{
 const okBeep =()=>{beep(523,70);setTimeout(()=>beep(659,70),80);setTimeout(()=>beep(784,110),165);};
 const errBeep=()=>beep(220,180,"sawtooth");
 
-const CAT_EMOJI=cat=>({
+const CAT_DEFAULT_EMOJI={
   "Instant Noodles":"🍜","Drinks":"🥤","Cigarettes":"🚬","Biscuits":"🍪",
   "Vegetables":"🥬","Condiments":"🧂","Snacks":"🍟","Canned Goods":"🥫",
   "Hygiene":"🧼","Dairy":"🥛","Rice & Grains":"🌾","Frozen Foods":"🧊",
   "Candies":"🍬","Bread":"🍞","Cooking Oil":"🍳","Coffee & Tea":"☕","Others":"📦"
-})[cat]||"📦";
-
+};
 const ALL_CATS=["Instant Noodles","Drinks","Cigarettes","Biscuits","Vegetables",
   "Condiments","Snacks","Canned Goods","Hygiene","Dairy","Rice & Grains",
   "Frozen Foods","Candies","Bread","Cooking Oil","Coffee & Tea","Others"];
+const OTHERS="Others";   /* locked fallback category: can't be renamed or deleted */
+const CAT_EMOJI_CHOICES=["🍜","🥤","🍪","🥬","🧂","🍟","🥫","🧼","🥛","🌾","🧊","🍬","🍞","🍳","☕","🍺","🍎","🍗","🥚","🐟","🧴","🔋","🧻","🐾","💊","🍫","🛒","📦"];
+
+/* Categories are real, editable data stored in db.categories = [{id,name,emoji}].
+   Stores that predate this feature have no db.categories yet, so we fall back to the
+   built-in list, plus any custom category names already used by products. */
+const getCats=d=>{
+  const stored=asArr(d?.categories).filter(c=>c&&c.name);
+  const base=stored.length?stored:ALL_CATS.map(n=>({id:"d_"+n,name:n,emoji:CAT_DEFAULT_EMOJI[n]}));
+  const known=new Set(base.map(c=>c.name.toLowerCase()));
+  const extra=[];
+  asArr(d?.products).forEach(p=>{
+    const n=p?.category;
+    if(n&&!known.has(n.toLowerCase())){known.add(n.toLowerCase());extra.push({id:"x_"+n,name:n,emoji:"📦"});}
+  });
+  const out=[...base,...extra];
+  if(!out.some(c=>c.name===OTHERS))out.push({id:"d_"+OTHERS,name:OTHERS,emoji:"📦"});
+  return out;
+};
+/* Module-level name→emoji lookup, refreshed on every App render so CAT_EMOJI works anywhere */
+let _catReg={};
+const setCatRegistry=d=>{_catReg=Object.fromEntries(getCats(d).map(c=>[c.name,c.emoji||"📦"]));};
+const CAT_EMOJI=cat=>_catReg[cat]||CAT_DEFAULT_EMOJI[cat]||"📦";
 
 /* ═══════════════════════════════════════════
    EXCEL
@@ -969,6 +1030,7 @@ export default function App(){
   },[loggedIn,pinOk]);
 
   TC.set=setToastS;
+  setCatRegistry(db);
 
   useEffect(()=>{document.documentElement.className=dark?"dark":"";},[dark]);
   useEffect(()=>{if(toastS){clearTimeout(_tt);_tt=setTimeout(()=>setToastS(null),3200);}},[toastS]);
@@ -2046,8 +2108,11 @@ function Inventory({db,saveData,setConfirm}){
   const [catF,  setCatF]  =useState("All");
   const [modal, setModal] =useState(false);
   const [editP, setEditP] =useState(null);
+  const [catMgr,setCatMgr]=useState(false);
   const prods=db.products||[];
   const usedCats=["All",...new Set(prods.map(p=>p.category))];
+  const cats=useMemo(()=>getCats(db),[db]);
+  const counts=useMemo(()=>{const m={};prods.forEach(p=>{m[p.category]=(m[p.category]||0)+1;});return m;},[prods]);
   const filtered=useMemo(()=>[...prods]
     .sort((a,b)=>a.name.localeCompare(b.name))
     .filter(p=>(catF==="All"||p.category===catF)&&p.name.toLowerCase().includes(search.toLowerCase()))
@@ -2072,6 +2137,47 @@ function Inventory({db,saveData,setConfirm}){
     toast(isNew?"Product added!":"Product updated!");okBeep();
   };
 
+  /* Category add / edit / delete. Renames and deletes also update the products that use the category. */
+  const catOps={
+    add:async(rawName,rawEmoji)=>{
+      const name=cleanName(rawName,30);
+      if(!name){toast("Enter a category name!","err");return null;}
+      const d=getLS();const cur=getCats(d);
+      if(cur.some(c=>c.name.toLowerCase()===name.toLowerCase())){toast("Category already exists!","err");errBeep();return null;}
+      const item={id:uid(),name,emoji:cleanName(rawEmoji,8)||"📦"};
+      const oi=cur.findIndex(c=>c.name===OTHERS);   /* keep "Others" last */
+      d.categories=oi<0?[...cur,item]:[...cur.slice(0,oi),item,...cur.slice(oi)];
+      await saveData(d);toast("Category added!");okBeep();
+      return item;
+    },
+    edit:async(id,rawName,rawEmoji)=>{
+      const d=getLS();const cur=getCats(d);
+      const c=cur.find(x=>x.id===id);if(!c)return null;
+      const name=c.name===OTHERS?OTHERS:cleanName(rawName,30);
+      if(!name){toast("Enter a category name!","err");return null;}
+      if(cur.some(x=>x.id!==id&&x.name.toLowerCase()===name.toLowerCase())){toast("Category already exists!","err");errBeep();return null;}
+      const emoji=cleanName(rawEmoji,8)||"📦";
+      d.categories=cur.map(x=>x.id===id?{...x,name,emoji}:x);
+      if(name!==c.name)d.products=asArr(d.products).map(p=>p.category===c.name?{...p,category:name}:p);
+      await saveData(d);
+      if(name!==c.name&&catF===c.name)setCatF(name);
+      toast("Category updated!");okBeep();
+      return{id,from:c.name,to:name};
+    },
+    remove:async id=>{
+      const d=getLS();const cur=getCats(d);
+      const c=cur.find(x=>x.id===id);
+      if(!c||c.name===OTHERS)return null;
+      let moved=0;
+      d.products=asArr(d.products).map(p=>{if(p.category===c.name){moved++;return{...p,category:OTHERS};}return p;});
+      d.categories=cur.filter(x=>x.id!==id);
+      await saveData(d);
+      if(catF===c.name)setCatF("All");
+      toast(moved?`Category deleted. ${moved} product${moved===1?"":"s"} moved to Others.`:"Category deleted.");
+      return{id,name:c.name,moved};
+    }
+  };
+
   const handleDelete=p=>setConfirm({
     title:"Delete Product",msg:`Delete "${p.name}"?\nThis cannot be undone.`,
     icon:<FontAwesomeIcon icon={faTrashCan} />,danger:true,confirmText:"Delete",
@@ -2083,12 +2189,14 @@ function Inventory({db,saveData,setConfirm}){
 
   return(
     <div style={{display:"contents"}}>
-      {modal&&<ProdModal product={editP} defaultCategory={catF==="All"?"":catF} extraCats={usedCats.filter(c=>c!=="All"&&!ALL_CATS.includes(c))} onSave={handleSave} onClose={()=>{setModal(false);setEditP(null);}}/>}
+      {modal&&<ProdModal product={editP} defaultCategory={catF==="All"?"":catF} cats={cats} counts={counts} catOps={catOps} onSave={handleSave} onClose={()=>{setModal(false);setEditP(null);}}/>}
+      {catMgr&&<CategoryManager cats={cats} counts={counts} ops={catOps} onClose={()=>setCatMgr(false)}/>}
 
       <div className="pg-page">
         <div className="pg-hdr">
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <SearchBar value={search} onChange={setSearch} placeholder="Search products…"/>
+            <button className="btn bg2 bsm" style={{flexShrink:0}} title="Manage categories" aria-label="Manage categories" onClick={()=>setCatMgr(true)}><FontAwesomeIcon icon={faTags}/></button>
             <button className="btn bp bsm" style={{flexShrink:0,whiteSpace:"nowrap"}} onClick={()=>{setEditP(null);setModal(true);}}>+ Add Product</button>
           </div>
           <DragScroll style={{paddingBottom:2,marginTop:10}}>
@@ -2168,17 +2276,125 @@ function InventoryCard({p,stockColor,stockBg,stockLabel,onEdit,onDelete}){
   );
 }
 
+/* Add / rename / delete categories. Rendered above whatever opened it (inventory page or picker). */
+function CategoryManager({cats,counts,ops,onClose}){
+  const blank={id:null,name:"",emoji:"📦"};
+  const [f,setF]=useState(blank);
+  const [delId,setDelId]=useState(null);
+  const [busy,setBusy]=useState(false);
+  useEffect(()=>{
+    const onKey=e=>{if(e.key==="Escape")onClose();};
+    document.addEventListener("keydown",onKey);
+    return()=>document.removeEventListener("keydown",onKey);
+  },[onClose]);
+  const editing=!!f.id;
+  const locked=editing&&cats.find(c=>c.id===f.id)?.name===OTHERS;
+  const submit=async()=>{
+    if(busy)return;
+    setBusy(true);
+    try{
+      const r=editing?await ops.edit(f.id,f.name,f.emoji):await ops.add(f.name,f.emoji);
+      if(r)setF(blank);
+    }finally{setBusy(false);}
+  };
+  const doDelete=async c=>{
+    if(busy)return;
+    setBusy(true);
+    try{
+      const r=await ops.remove(c.id);
+      if(r){setDelId(null);if(f.id===c.id)setF(blank);}
+    }finally{setBusy(false);}
+  };
+  return createPortal(
+    <div className="backdrop cp-backdrop cm-backdrop" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="msheet cp-sheet">
+        <div className="shandle" style={{marginBottom:12}}/>
+        <div className="cp-head">
+          <div className="cp-title">Manage Categories</div>
+          <button type="button" className="cp-x" onClick={onClose} aria-label="Close"><FontAwesomeIcon icon={faXmark}/></button>
+        </div>
+
+        <div className="cm-form">
+          <div style={{fontSize:12.5,fontWeight:600,color:"var(--tx2)",marginBottom:8}}>
+            {editing?"Edit category":"New category"}
+          </div>
+          <div className="cm-row">
+            <input className="cm-emoji-in" value={f.emoji} maxLength={8} aria-label="Emoji"
+              onChange={e=>setF(p=>({...p,emoji:e.target.value}))}/>
+            <input autoFocus={!editing} placeholder="e.g. Pet Supplies" value={f.name} maxLength={30}
+              disabled={locked} aria-label="Category name"
+              onChange={e=>setF(p=>({...p,name:e.target.value}))}
+              onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();submit();}}}/>
+            <button type="button" className="btn bp" style={{flexShrink:0}} disabled={busy} onClick={submit}>
+              {editing?"Save":"Add"}
+            </button>
+            {editing&&<button type="button" className="btn bg2" style={{flexShrink:0}} onClick={()=>setF(blank)}>Cancel</button>}
+          </div>
+          {locked&&<div style={{fontSize:11.5,color:"var(--tx3)",marginTop:8}}>"Others" is the fallback category, so only its emoji can be changed.</div>}
+          <div className="cm-chips">
+            {CAT_EMOJI_CHOICES.map(em=>(
+              <button type="button" key={em} className={`cm-chip ${f.emoji===em?"on":""}`}
+                onClick={()=>setF(p=>({...p,emoji:em}))} aria-label={`Use ${em}`}>{em}</button>
+            ))}
+          </div>
+        </div>
+
+        <div className="cm-list">
+          {cats.map(c=>{
+            const n=counts?.[c.name]||0;
+            if(delId===c.id)return(
+              <div key={c.id} className="cm-item" style={{borderColor:"var(--dn)"}}>
+                <div className="cm-del">
+                  Delete <b>{c.name}</b>?{n>0?` Its ${n} product${n===1?"":"s"} will move to "Others".`:""}
+                </div>
+                <button type="button" className="btn bg2 bsm" onClick={()=>setDelId(null)}>Cancel</button>
+                <button type="button" className="btn bd2 bsm" disabled={busy} onClick={()=>doDelete(c)}>Delete</button>
+              </div>
+            );
+            return(
+              <div key={c.id} className={`cm-item ${f.id===c.id?"editing":""}`}>
+                <span className="cm-emo">{c.emoji||"📦"}</span>
+                <span className="cm-name">{c.name}<span className="cm-cnt">{n} item{n===1?"":"s"}</span></span>
+                <button type="button" className="cm-ib" aria-label={`Edit ${c.name}`}
+                  onClick={()=>{setDelId(null);setF({id:c.id,name:c.name,emoji:c.emoji||"📦"});}}>
+                  <FontAwesomeIcon icon={faPen}/>
+                </button>
+                {c.name!==OTHERS&&(
+                  <button type="button" className="cm-ib dn" aria-label={`Delete ${c.name}`}
+                    onClick={()=>{setF(blank);setDelId(c.id);}}>
+                    <FontAwesomeIcon icon={faTrashCan}/>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>,document.body);
+}
+
 /* Clean, minimal category picker: input-style trigger + bottom sheet of tiles
    (replaces the native <select>, which renders a clunky OS list on mobile). */
-function CategoryPicker({value,onChange,options}){
+function CategoryPicker({value,onChange,cats,counts,ops}){
   const [open,setOpen]=useState(false);
+  const [mgr,setMgr]=useState(false);
   useEffect(()=>{
     if(!open)return;
-    const onKey=e=>{if(e.key==="Escape")setOpen(false);};
+    const onKey=e=>{if(e.key==="Escape"&&!document.querySelector(".cm-backdrop"))setOpen(false);};
     document.addEventListener("keydown",onKey);
     return()=>document.removeEventListener("keydown",onKey);
   },[open]);
-  const pick=c=>{onChange(c);setOpen(false);};
+  const [adding,setAdding]=useState(false);
+  const [newCat,setNewCat]=useState("");
+  const pick=c=>{onChange(c);setOpen(false);setAdding(false);setNewCat("");};
+  const addCat=async()=>{
+    const name=cleanName(newCat,30);
+    if(!name){toast("Enter a category name!","err");return;}
+    const existing=cats.find(c=>c.name.toLowerCase()===name.toLowerCase());
+    if(existing){pick(existing.name);return;}
+    const r=await ops.add(name,"📦");
+    if(r)pick(r.name);
+  };
   return(
     <>
       <button type="button" className={`cp-trigger ${open?"open":""}`} onClick={()=>setOpen(true)}>
@@ -2193,57 +2409,88 @@ function CategoryPicker({value,onChange,options}){
             <div className="shandle" style={{marginBottom:12}}/>
             <div className="cp-head">
               <div className="cp-title">Select Category</div>
-              <button type="button" className="cp-x" onClick={()=>setOpen(false)} aria-label="Close">
-                <FontAwesomeIcon icon={faXmark}/>
-              </button>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <button type="button" className="cp-mng" onClick={()=>setMgr(true)}>
+                  <FontAwesomeIcon icon={faPen}/> Manage
+                </button>
+                <button type="button" className="cp-x" onClick={()=>setOpen(false)} aria-label="Close">
+                  <FontAwesomeIcon icon={faXmark}/>
+                </button>
+              </div>
             </div>
             <div className="cp-grid">
-              {options.map(c=>(
-                <button type="button" key={c} className={`cp-opt ${value===c?"on":""}`} onClick={()=>pick(c)}>
-                  <span className="cp-emo">{CAT_EMOJI(c)}</span>
-                  <span className="cp-lbl">{c}</span>
+              {cats.map(c=>(
+                <button type="button" key={c.id} className={`cp-opt ${value===c.name?"on":""}`} onClick={()=>pick(c.name)}>
+                  <span className="cp-emo">{c.emoji||"📦"}</span>
+                  <span className="cp-lbl">{c.name}</span>
                 </button>
               ))}
+              {!adding?(
+                <button type="button" className="cp-opt" style={{borderStyle:"dashed",color:"var(--ac)",fontWeight:600}}
+                  onClick={()=>setAdding(true)}>
+                  <span className="cp-emo"><FontAwesomeIcon icon={faPlus}/></span>
+                  <span className="cp-lbl">New category</span>
+                </button>
+              ):(
+                <div style={{gridColumn:"1/-1",display:"flex",gap:8}}>
+                  <input autoFocus placeholder="e.g. Pet Supplies" value={newCat} maxLength={30}
+                    onChange={e=>setNewCat(e.target.value)}
+                    onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();addCat();}}}/>
+                  <button type="button" className="btn bp" style={{flexShrink:0}} onClick={addCat}>Add</button>
+                </div>
+              )}
             </div>
           </div>
         </div>,document.body)}
+      {mgr&&<CategoryManager cats={cats} counts={counts} ops={ops} onClose={()=>setMgr(false)}/>}
     </>
   );
 }
 
-function ProdModal({product,onSave,onClose,defaultCategory="",extraCats=[]}){
+function ProdModal({product,onSave,onClose,defaultCategory="",cats=[],counts={},catOps}){
   const isNew=!product;
   const [form,setForm]=useState(isNew?{name:"",category:defaultCategory||"",price:"",stock:"",isOpenPrice:false}:{...product});
   const s=(k,v)=>setForm(p=>({...p,[k]:v}));
+  /* Keep this product's selected category in step with renames/deletes made from the picker */
+  const ops={...catOps,
+    edit:async(...a)=>{const r=await catOps.edit(...a);if(r&&r.from!==r.to)setForm(p=>p.category===r.from?{...p,category:r.to}:p);return r;},
+    remove:async(...a)=>{const r=await catOps.remove(...a);if(r)setForm(p=>p.category===r.name?{...p,category:OTHERS}:p);return r;}
+  };
+  /* Esc closes the dialog (unless the category picker is open on top — it handles its own Esc) */
+  useEffect(()=>{
+    const onKey=e=>{if(e.key==="Escape"&&!document.querySelector(".cp-backdrop"))onClose();};
+    document.addEventListener("keydown",onKey);
+    return()=>document.removeEventListener("keydown",onKey);
+  },[onClose]);
   return(
-    <div className="backdrop">
-      <div className="msheet mlg">
+    <div className="backdrop" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="msheet mlg prod-sheet">
         <div className="shandle"/>
-        <h3 style={{ fontWeight: 700, marginBottom: 20, fontSize: 16 }}>{isNew ? ("➕ Add Product") : (<><FontAwesomeIcon icon={faPen} /> Edit Product</>)}
+        <h3 style={{ fontWeight: 700, marginBottom: 12, fontSize: 16 }}>{isNew ? ("➕ Add Product") : (<><FontAwesomeIcon icon={faPen} /> Edit Product</>)}
         </h3>
         <div className="fg"><label>Product Name *</label>
           <input placeholder="e.g. Lucky Me Pancit Canton" value={form.name}
             onChange={e=>s("name",e.target.value)} autoFocus maxLength={200}/>
         </div>
         <div className="fg"><label>Category *</label>
-          <CategoryPicker value={form.category||""} onChange={v=>s("category",v)} options={[...ALL_CATS,...extraCats]}/>
+          <CategoryPicker value={form.category||""} onChange={v=>s("category",v)} cats={cats} counts={counts} ops={ops}/>
         </div>
-        <div style={{background:"var(--sf2)",borderRadius:"var(--rs)",padding:14,marginBottom:16,display:"flex",gap:12,alignItems:"flex-start"}}>
+        <div style={{background:"var(--sf2)",borderRadius:"var(--rs)",padding:"10px 12px",marginBottom:10,display:"flex",gap:10,alignItems:"flex-start"}}>
           <input type="checkbox" id="opx" checked={form.isOpenPrice} onChange={e=>s("isOpenPrice",e.target.checked)} style={{marginTop:2}}/>
           <div>
             <label htmlFor="opx" style={{fontWeight:600,fontSize:14,cursor:"pointer",color:"var(--tx)"}}>Open / Variable Price</label>
-            <div style={{fontSize:12,color:"var(--tx2)",marginTop:2}}>For items priced per amount (e.g. vegetables). Cashier enters price at checkout.</div>
+            <div style={{fontSize:11.5,lineHeight:1.35,color:"var(--tx2)",marginTop:1}}>For items priced per amount (e.g. vegetables). Cashier enters price at checkout.</div>
           </div>
         </div>
-        <div className="frow">
-          <div className="fg"><label>{form.isOpenPrice?"Base Price (optional)":"Price (₱) *"}</label>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <div className="fg"><label>{form.isOpenPrice?"Base Price":"Price (₱) *"}</label>
             <input type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" value={form.price} onChange={e=>s("price",e.target.value)}/>
           </div>
-          <div className="fg"><label>Stock Quantity *</label>
+          <div className="fg"><label>Stock Qty *</label>
             <input type="number" inputMode="numeric" min="0" placeholder="0" value={form.stock} onChange={e=>s("stock",e.target.value)}/>
           </div>
         </div>
-        <div style={{display:"flex",gap:10,marginTop:6}}>
+        <div style={{display:"flex",gap:10,marginTop:2}}>
           <button className="btn bg2" style={{flex:1}} onClick={onClose}>✕ Cancel</button>
           <button className="btn bp" style={{flex:2}} onClick={()=>onSave(form,isNew)}>
             <FontAwesomeIcon icon={faFloppyDisk} /> {isNew?"Add Product":"Save Changes"}
