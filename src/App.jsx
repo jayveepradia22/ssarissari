@@ -300,6 +300,24 @@ input[type=checkbox]{
 .prod-sheet .cp-trigger{min-height:42px;padding:8px 12px}
 .prod-sheet .btn{min-height:44px}
 @media(min-width:600px){.prod-sheet{padding:20px 22px!important}}
+/* New E-Load transaction dialog: compact so the whole form fits on screen without scrolling */
+.tx-sheet{padding:12px 16px max(14px,env(safe-area-inset-bottom))!important;max-height:100dvh}
+.tx-sheet .shandle{margin-bottom:8px}
+.tx-sheet h3{margin-bottom:10px!important}
+.tx-sheet .fg{margin-bottom:8px}
+.tx-sheet .fg label{margin-bottom:4px;font-size:12.5px}
+.tx-sheet input:not([type=checkbox]){min-height:40px;padding:8px 12px}
+.tx-sheet .mf.lg>input{min-height:46px;font-size:20px;padding-left:36px}
+.tx-sheet .mf>input{padding-left:30px}
+.tx-sheet .pseg button{min-height:32px}
+.tx-sheet .tx-link{margin-bottom:6px;padding:2px 0}
+.tx-sheet .tx-actions{margin-top:4px}
+.tx-sheet .btn{min-height:42px}
+.tx-sheet .tx-hint{margin-top:6px;margin-bottom:10px!important}
+.tx-sheet .tx-sum{padding:6px 8px;margin-bottom:8px}
+.tx-sheet .rg-sug{margin:0 0 8px;padding:5px 10px}
+.tx-sheet .tx-warn{padding:6px 12px!important;margin-bottom:8px!important}
+@media(min-width:600px){.tx-sheet{padding:20px 22px!important}}
 @keyframes shUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 .shandle{width:40px;height:4px;background:var(--bd);border-radius:4px;margin:0 auto 16px}
 
@@ -616,10 +634,11 @@ tr:hover td{background:var(--sf2)}
   .gx-pad{padding:0 14px}
   .gx-bleed{padding:0}
   .gx-stats{grid-template-columns:repeat(2,1fr)}
-  .gx-stats.rpt-stats{padding:0!important;gap:1px!important;margin-bottom:1px}
-  .gx-stats.rpt-stats .sc{border-radius:0!important;border:none!important;box-shadow:none!important;padding:11px 14px!important;margin:0!important}
-  .gx-stats .sc{gap:10px!important}
-  .gx-stats .sc>span{width:34px!important;height:34px!important;border-radius:9px!important;font-size:16px!important}
+  .gx-stats.rpt-stats{padding:0!important;gap:8px!important;margin:10px 0 16px!important}
+  .gx-stats.rpt-stats .sc{border-radius:10px!important;background:var(--sf)!important;border:1px solid var(--bd)!important;box-shadow:none!important;padding:16px!important;margin:0!important}
+  .gx-stats .sc{gap:12px!important}
+  .rpt-stats:not(.gx-stats){padding:0!important;gap:8px!important;margin:10px 0 16px!important}
+  .rpt-stats:not(.gx-stats) .sc{border-radius:10px!important;background:var(--sf)!important;border:1px solid var(--bd)!important;box-shadow:none!important;padding:16px!important;margin:0!important}
   .gx-stats .sl{margin-top:0}
   .gx-banner{border-radius:0!important;border-left:none!important;border-right:none!important;margin-bottom:1px!important}
   .gx-bleed .rg-card{border-radius:0;border-left:none;border-right:none;margin-bottom:8px}
@@ -2695,7 +2714,7 @@ function Utang({db,saveData,setConfirm}){
         </div>
 
         {/* Customer list — scrollable */}
-        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:1}}>
+        <div className="pg-body" style={{display:"flex",flexDirection:"column",gap:1,paddingTop:10}}>
           {filteredCustomers.length===0&&(
             <div className="cust-card" style={{padding:"28px 16px",textAlign:"center",color:"var(--tx3)",fontSize:14}}>
               {search?"No customers match your search.":"No customers yet."}
@@ -2875,10 +2894,10 @@ function Reports({db}){
 
       <div className="pg-body">
         <div className="rpt-stats" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:5,marginTop:10,marginBottom:20}}>
-          <div className="sc"><div style={{fontSize:24}}>💵</div><div className="sn" style={{color:"var(--ac)"}}>{fmt(cashSales)}</div><div className="sl">Cash Sales</div></div>
-          <div className="sc"><div style={{fontSize:24}}>🧾</div><div className="sn" style={{color:"var(--in)"}}>{filtered.length}</div><div className="sl">Transactions</div></div>
-          <div className="sc"><div style={{fontSize:24}}>📋</div><div className="sn" style={{color:"var(--wn)"}}>{fmt(utangSales)}</div><div className="sl">On Credit</div></div>
-          <div className="sc"><div style={{fontSize:24}}>💰</div><div className="sn" style={{color:"#8e44ad"}}>{fmt(cashSales+utangSales)}</div><div className="sl">Gross Revenue</div></div>
+          <div className="sc" style={{"--c":"var(--ac)"}}><div style={{fontSize:24}}>💵</div><div className="sn" style={{color:"var(--ac)"}}>{fmt(cashSales)}</div><div className="sl">Cash Sales</div></div>
+          <div className="sc" style={{"--c":"var(--in)"}}><div style={{fontSize:24}}>🧾</div><div className="sn" style={{color:"var(--in)"}}>{filtered.length}</div><div className="sl">Transactions</div></div>
+          <div className="sc" style={{"--c":"var(--wn)"}}><div style={{fontSize:24}}>📋</div><div className="sn" style={{color:"var(--wn)"}}>{fmt(utangSales)}</div><div className="sl">On Credit</div></div>
+          <div className="sc" style={{"--c":"#8e44ad"}}><div style={{fontSize:24}}>💰</div><div className="sn" style={{color:"#8e44ad"}}>{fmt(cashSales+utangSales)}</div><div className="sl">Gross Revenue</div></div>
         </div>
         <div className="card" style={{padding:18,marginBottom:18}}>
           <h3 style={{fontWeight:700,marginBottom:14,fontSize:14}}>Top Products by Revenue</h3>
@@ -3579,7 +3598,7 @@ function Seg({value,onChange,options,cols}){
 
 function StatCard({label,value,color,sub,icon}){
   return(
-    <div className="sc" style={{minWidth:0,display:"flex",gap:12,alignItems:"flex-start"}}>
+    <div className="sc" style={{minWidth:0,display:"flex",gap:12,alignItems:"flex-start","--c":color}}>
       {icon&&<span style={{display:"inline-flex",alignItems:"center",justifyContent:"center",flexShrink:0,width:44,height:44,borderRadius:12,
         background:`color-mix(in srgb, ${color} 14%, transparent)`,color,fontSize:20}}><FontAwesomeIcon icon={icon}/></span>}
       <div style={{minWidth:0,flex:1}}>
@@ -3671,7 +3690,7 @@ function GCashRateGuide({rates,onEdit}){
         <button type="button" className="rg-toggle" aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
           <span className="rg-ic"><FontAwesomeIcon icon={faFileLines}/></span>
           <span style={{minWidth:0}}>
-            <span className="rg-title" style={{whiteSpace:"normal",overflow:"visible",textOverflow:"clip"}}>GCash Rate Charge Guide</span>
+            <span className="rg-title" style={{whiteSpace:"normal",overflow:"visible",textOverflow:"clip"}}>GCash Rate Charge</span>
             <span className="rg-sub" style={{whiteSpace:"normal",overflow:"visible",textOverflow:"clip"}}>Fees by transaction amount</span>
           </span>
         </button>
@@ -3907,7 +3926,7 @@ function GCashForm({balances,rates,onSave,onClose}){
         </div>
       )}
       {goesNegative&&(
-        <div style={{background:"var(--wnl)",border:"1.5px solid var(--wn)",borderRadius:"var(--rs)",padding:"10px 14px",marginBottom:14,fontSize:12,color:"var(--wn)",fontWeight:500}}>
+        <div className="tx-warn" style={{background:"var(--wnl)",border:"1.5px solid var(--wn)",borderRadius:"var(--rs)",padding:"10px 14px",marginBottom:14,fontSize:12,color:"var(--wn)",fontWeight:500}}>
           {afterCash<0&&afterGcash<0?"Cash on Hand and GCash Wallet":afterCash<0?"Cash on Hand":"GCash Wallet"} would go below zero after this transaction.
         </div>
       )}
@@ -4014,7 +4033,7 @@ function GCash({db,saveData,setConfirm}){
     <div style={{display:"contents"}}>
       {newModal&&(
         <div className="backdrop">
-          <div className="msheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
+          <div className="msheet tx-sheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
             <div className="shandle"/>
             <h3 style={{fontWeight:700,marginBottom:18,fontSize:16}}><FontAwesomeIcon icon={faWallet} /> New GCash Transaction</h3>
             <GCashForm balances={bal} rates={rates} onSave={saveTxn} onClose={()=>setNewModal(false)}/>
@@ -4242,7 +4261,7 @@ function ELoad({db,saveData,setConfirm}){
     <div style={{display:"contents"}}>
       {newModal&&(
         <div className="backdrop">
-          <div className="msheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
+          <div className="msheet tx-sheet" style={{maxWidth:440,alignSelf:"center",borderRadius:"var(--r)"}}>
             <div className="shandle"/>
             <h3 style={{fontWeight:700,marginBottom:18,fontSize:16}}><FontAwesomeIcon icon={faMobileScreenButton} /> New E-Load Transaction</h3>
             <ELoadForm onSave={saveTxn} onClose={()=>setNewModal(false)}/>
